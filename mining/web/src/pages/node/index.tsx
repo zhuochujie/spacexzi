@@ -17,13 +17,13 @@ import {
 import { appChain, appChainId, ensureAppChain, wagmiConfig } from '../../web3/config'
 import { node, usdtToken } from '../../web3/constants'
 import { getNodeChainOverview } from '../../web3/node'
-import { useI18n } from '../../i18n'
+import { getFriendlyErrorKey, useI18n } from '../../i18n'
 import logo from './logo.png'
 import art from './node.png'
 import styles from './landing.module.css'
 
 export default function NodePage() {
-    const { t } = useI18n()
+    const { t, language } = useI18n()
     const navigate = useNavigate()
     const client = useQueryClient()
     const connection = useConnection()
@@ -83,7 +83,7 @@ export default function NodePage() {
     const display = (amount: string) =>
         Number(
             formatUnits(BigInt(amount), data?.decimals ?? 18),
-        ).toLocaleString(undefined, { maximumFractionDigits: 4 })
+        ).toLocaleString(({ zh: 'zh-CN', en: 'en-US', th: 'th-TH', ko: 'ko-KR' })[language], { maximumFractionDigits: 4 })
     async function buy(index: number, resume?: NodeSignature) {
         if (busy || !data) return
         setBusy(true)
@@ -168,13 +168,20 @@ export default function NodePage() {
             await submitNodeNonce(signature.nonce).catch(() => undefined)
             toast.success(t('node.submitted'))
         } catch (error) {
-            toast.error(
-                error instanceof Error && error.message.startsWith('api.')
-                    ? t('node.failed')
-                    : error instanceof Error
-                      ? error.message.split('\n')[0]
-                      : t('node.failed'),
-            )
+            const message = error instanceof Error ? error.message : ''
+            const nodeErrors: Record<string, string> = {
+                NODE_PURCHASE_PENDING: 'node.purchasePending',
+                NODE_PURCHASE_PAUSED: 'node.paused',
+                NODE_INVALID_LEVEL: 'node.invalidLevel',
+                NODE_SIGNATURE_NOT_FOUND: 'node.signatureNotFound',
+                NODE_DEPLOYMENT_MISMATCH: 'node.configMismatch',
+                NODE_MINING_CONFIG_MISMATCH: 'node.configMismatch',
+                NODE_USDT_CONFIG_MISMATCH: 'node.configMismatch',
+            }
+            const localMessages = ['node.walletMismatch', 'node.notConfigured', 'common.insufficientBalance', 'common.walletActionFailed', 'node.expired']
+            const localMessage = localMessages.find((key) => t(key) === message)
+            const cancelled = /user rejected|user denied|rejected the request/i.test(message)
+            toast.error(t(localMessage ?? nodeErrors[message] ?? (cancelled ? 'node.cancelled' : message.startsWith('api.') ? message : getFriendlyErrorKey(message, 'node.failed'))))
         } finally {
             setBusy(false)
             setStage('')
@@ -195,6 +202,10 @@ export default function NodePage() {
     const currentTier = data?.levels.find(
         (level) => level.index + 1 === data.level,
     )
+    const tierName = (name: string, level: number) => {
+        const defaults: Record<string, string> = { Starter: 'node.tierStarter', Core: 'node.tierCore', Elite: 'node.tierElite', Prime: 'node.tierPrime' }
+        return defaults[name] ? t(defaults[name]) : name || t('node.tierNumber', { level })
+    }
     const currentPrice = currentTier ? BigInt(currentTier.price) : 0n
     const shortAddress = address
         ? `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -243,7 +254,7 @@ export default function NodePage() {
                     </span>
                     <div className={styles['brand-text']}>
                         <strong>SPACE</strong>
-                        <span>Node Network</span>
+                        <span>{t('node.landing.networkLabel')}</span>
                     </div>
                 </div>
                 <span
@@ -256,7 +267,7 @@ export default function NodePage() {
 
             <section className={styles['hero-shell']}>
                 <div className={styles['hero-copy']}>
-                    <span className={styles.eyebrow}>Node Access Protocol</span>
+                    <span className={styles.eyebrow}>{t('node.landing.accessLabel')}</span>
                     <h1>{t('node.landing.heading')}</h1>
                     <p className={styles['hero-text']}>
                         {t('node.landing.description')}
@@ -274,7 +285,7 @@ export default function NodePage() {
                             {overview.isLoading
                                 ? '—'
                                 : data?.level
-                                  ? (currentTier?.name ?? data.level)
+                                  ? tierName(currentTier?.name ?? '', data.level)
                                   : t('node.inactive')}
                         </strong>
                     </div>
@@ -320,7 +331,7 @@ export default function NodePage() {
                                     }
                                 >
                                     <span>
-                                        {tier.name}
+                                        {tierName(tier.name, tier.index + 1)}
                                         {owned && (
                                             <small>{t('node.owned')}</small>
                                         )}
@@ -433,7 +444,7 @@ export default function NodePage() {
 
             <section className={styles['content-block']}>
                 <div className={styles['section-heading']}>
-                    <span className={styles.eyebrow}>Value</span>
+                    <span className={styles.eyebrow}>{t('node.landing.valueLabel')}</span>
                     <h2>{t('node.landing.valueHeading')}</h2>
                 </div>
                 <div className={styles['card-stack']}>
@@ -450,7 +461,7 @@ export default function NodePage() {
             </section>
             <section className={styles['content-block']}>
                 <div className={styles['section-heading']}>
-                    <span className={styles.eyebrow}>Process</span>
+                    <span className={styles.eyebrow}>{t('node.landing.processLabel')}</span>
                     <h2>{t('node.landing.processHeading')}</h2>
                 </div>
                 <article className={styles['flow-card']}>
@@ -464,7 +475,7 @@ export default function NodePage() {
             </section>
             <section className={styles['content-block']}>
                 <div className={styles['section-heading']}>
-                    <span className={styles.eyebrow}>FAQ</span>
+                    <span className={styles.eyebrow}>{t('node.landing.faqLabel')}</span>
                     <h2>{t('node.landing.faqHeading')}</h2>
                 </div>
                 <div className={styles['card-stack']}>
@@ -477,7 +488,7 @@ export default function NodePage() {
                 </div>
             </section>
             <footer className={styles['site-footer']}>
-                <p>© 2026 SPACE. All rights reserved.</p>
+                <p>{t('node.landing.copyright', { year: new Date().getFullYear() })}</p>
             </footer>
 
             <dialog
@@ -488,7 +499,7 @@ export default function NodePage() {
             >
                 <div className={styles['modal-head']}>
                     <div>
-                        <span className={styles.eyebrow}>Referral Data</span>
+                        <span className={styles.eyebrow}>{t('node.landing.referralLabel')}</span>
                         <h2 id="node-referral-title">
                             {t('node.landing.referralData')}
                         </h2>
@@ -533,10 +544,6 @@ export default function NodePage() {
                         </strong>
                     </div>
                 </div>
-                <p className={styles['modal-note']}>
-                    {t('node.available')}: {referralData ? display(referralData.usdtBalance) : '—'}{' '}
-                    USDT
-                </p>
             </dialog>
         </main>
     )

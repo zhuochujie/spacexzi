@@ -1,4 +1,11 @@
 export const nodeLandingZh = {
+    networkLabel: "节点网络",
+    accessLabel: "节点接入协议",
+    valueLabel: "节点权益",
+    processLabel: "接入流程",
+    faqLabel: "常见问题",
+    referralLabel: "推荐统计",
+    copyright: "© {{year}} SPACE。保留所有权利。",
     heading: 'SPACE空间站节点预售',
     description:
         'SPACE 是一个围绕空间站节点构建的链上网络项目，通过节点接入建立链上身份，参与等级升级、社区推荐和网络扩展。',
@@ -34,6 +41,13 @@ export const nodeLandingZh = {
         '升级仅支付目标等级与当前等级之间的差价，不需要重复支付当前等级已完成的金额。',
 }
 export const nodeLandingEn: typeof nodeLandingZh = {
+    networkLabel: "Node Network",
+    accessLabel: "Node Access Protocol",
+    valueLabel: "Benefits",
+    processLabel: "Process",
+    faqLabel: "FAQ",
+    referralLabel: "Referral Statistics",
+    copyright: "© {{year}} SPACE. All rights reserved.",
     heading: 'SPACE Station Node Presale',
     description:
         'SPACE is an on-chain network built around station nodes. Establish your node identity, upgrade your membership and help grow the community network.',
@@ -69,6 +83,13 @@ export const nodeLandingEn: typeof nodeLandingZh = {
         'You pay only the difference between the target and current tier prices, without paying again for your existing tier.',
 }
 export const nodeLandingTh: typeof nodeLandingZh = {
+    networkLabel: "เครือข่ายโหนด",
+    accessLabel: "ระบบเข้าร่วมโหนด",
+    valueLabel: "สิทธิประโยชน์",
+    processLabel: "ขั้นตอนเข้าร่วม",
+    faqLabel: "คำถามที่พบบ่อย",
+    referralLabel: "สถิติการแนะนำ",
+    copyright: "© {{year}} SPACE สงวนลิขสิทธิ์",
     heading: 'พรีเซลโหนดสถานี SPACE',
     description:
         'SPACE คือเครือข่ายบนเชนที่สร้างขึ้นรอบโหนดสถานี เข้าร่วมเพื่อสร้างตัวตนบนเชน อัปเกรดระดับ และขยายเครือข่ายชุมชน',
@@ -104,6 +125,13 @@ export const nodeLandingTh: typeof nodeLandingZh = {
         'จ่ายเฉพาะส่วนต่างราคาระหว่างระดับเป้าหมายและระดับปัจจุบัน ไม่ต้องจ่ายค่าระดับเดิมซ้ำ',
 }
 export const nodeLandingKo: typeof nodeLandingZh = {
+    networkLabel: "노드 네트워크",
+    accessLabel: "노드 참여 프로토콜",
+    valueLabel: "노드 혜택",
+    processLabel: "참여 절차",
+    faqLabel: "자주 묻는 질문",
+    referralLabel: "추천 통계",
+    copyright: "© {{year}} SPACE. 모든 권리 보유.",
     heading: 'SPACE 스테이션 노드 사전 판매',
     description:
         'SPACE는 스테이션 노드를 중심으로 구축된 온체인 네트워크입니다. 노드에 참여하여 온체인 신원을 만들고 등급과 커뮤니티 네트워크를 확장하세요.',
