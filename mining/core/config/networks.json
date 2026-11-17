@@ -1,0 +1,14 @@
+{
+  "bsc": {
+    "id": 56,
+    "rpcUrl": "https://56.rpc.thirdweb.com"
+  },
+  "bscTestnet": {
+    "id": 97,
+    "rpcUrl": "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
+  },
+  "anvil": {
+    "id": 31337,
+    "rpcUrl": "http://127.0.0.1:8545"
+  }
+}

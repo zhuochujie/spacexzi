@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: PingFangSC, PingFang SC;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    background-color: #00081A;
+}
+
+.route-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.24);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: route-loading-spin 0.7s linear infinite;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes route-loading-spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.action-toast {
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    color: #F1F2F4;
+    font-size: 13px;
+    border: 1px solid rgba(22, 134, 255, 0.32);
+    border-radius: 8px;
+    background: rgba(2, 13, 32, 0.96);
+    box-shadow: 0 12px 32px rgba(0, 8, 26, 0.34);
+}
+
+.action-toast button {
+    flex-shrink: 0;
+    padding: 5px 9px;
+    color: #FFFFFF;
+    font-size: 12px;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #6536E7 0%, #006EFF 100%);
+}
+
+
+@font-face {
+    font-family: 'AlimamaShuHeiTi';
+    src: url('./assets/fonts/AlimamaShuHeiTi-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 原有精简字体不包含“节点计划”，仅为这四个字加载补充字库。 */
+@font-face {
+    font-family: 'AlimamaShuHeiTi';
+    src: url('./assets/fonts/AlimamaShuHeiTi-Node.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+5212, U+70B9, U+8282, U+8BA1;
+}

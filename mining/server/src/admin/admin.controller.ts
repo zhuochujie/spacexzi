@@ -1,0 +1,337 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Query,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { Admin } from 'src/common/decorators/admin.decorator';
+import {
+  type AdminJwtAccount,
+  CurrentAccount,
+} from 'src/common/decorators/current-account.decorator';
+import { AdminService } from './admin.service';
+import { AdminAccountListQueryDto } from './dto/admin-account-list-query.dto';
+import { BalanceLogQueryDto } from 'src/account/dto/balance-log-query.dto';
+import { AdminUpdateUserLevelsDto } from './dto/admin-update-user-levels.dto';
+import { AdminUpdateDividendRuleDto } from './dto/admin-update-dividend-rule.dto';
+import { AdminPageQueryDto } from './dto/admin-page-query.dto';
+import { AdminUpdateConfigDto } from './dto/admin-update-config.dto';
+import { DividendRuleCategory } from 'src/config/entities/dividend-rule.entity';
+import { AccountBalanceLogToken } from 'src/account/entities/account-balance-log.entity';
+import { AdminCreateNoticeDto } from './dto/admin-create-notice.dto';
+import { AdminUpdateNoticeDto } from './dto/admin-update-notice.dto';
+import { AdminCreateMinerDto } from './dto/admin-create-miner.dto';
+import { AdminUpdateMinerDto } from './dto/admin-update-miner.dto';
+import { AdminAction } from 'src/notification/admin-action.decorator';
+import { AdminAccelerateMinerDto } from './dto/admin-accelerate-miner.dto';
+import { AdminAddSystemRewardDto } from './dto/admin-add-system-reward.dto';
+import { AdminBatchAccelerateMinersDto } from './dto/admin-batch-accelerate-miners.dto';
+import { AdminTransferUserBalanceDto } from './dto/admin-transfer-user-balance.dto';
+import { AdminTeamMembersQueryDto } from './dto/admin-team-members-query.dto';
+import { AdminDeleteUserDto } from './dto/admin-delete-user.dto';
+import { AdminTeamMinerPurchaseStatsQueryDto } from './dto/admin-team-miner-purchase-stats-query.dto';
+import { MaintenanceService } from 'src/maintenance/maintenance.service';
+import { UpdateMaintenanceDto } from 'src/maintenance/dto/update-maintenance.dto';
+import { MarketService } from 'src/market/market.service';
+import { AdminUpdateMarketVolumeAdjustmentDto } from './dto/admin-update-market-volume-adjustment.dto';
+import { AdminUpdateMarketMakerWhitelistDto } from './dto/admin-update-market-maker-whitelist.dto';
+import { BuybackRankingDto } from 'src/market/dto/buyback-ranking.dto';
+
+@Admin()
+@Controller('admin')
+export class AdminController {
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly maintenanceService: MaintenanceService,
+    private readonly marketService: MarketService,
+  ) {}
+
+  @Get('profile')
+  getProfile(@CurrentAccount() account: AdminJwtAccount) {
+    return {
+      id: account.sub,
+      username: account.username,
+    };
+  }
+
+  @Get('buyback/ranking')
+  getBuybackRanking(@Query() query: BuybackRankingDto) {
+    return this.marketService.getBuybackRanking(
+      query.startTime,
+      query.endTime,
+      query.page,
+      query.pageSize,
+      query.account,
+    );
+  }
+
+  @Get('users')
+  getUsers(@Query() query: AdminAccountListQueryDto) {
+    return this.adminService.getUsers(query);
+  }
+
+  @Get('dividend-rules')
+  getDividendRules() {
+    return this.adminService.getDividendRules();
+  }
+
+  @Get('mining/status')
+  getMiningStatus() {
+    return this.adminService.getMiningStatus();
+  }
+
+  @Post('mining/start')
+  @AdminAction('开启产币')
+  startMining() {
+    return this.adminService.startMining();
+  }
+
+  @Get('configs')
+  getConfigs() {
+    return this.adminService.getConfigs();
+  }
+
+  @Get('maintenance')
+  getMaintenance() {
+    return this.maintenanceService.getState();
+  }
+
+  @Put('maintenance')
+  @AdminAction('修改系统维护状态')
+  updateMaintenance(@Body() dto: UpdateMaintenanceDto) {
+    return this.maintenanceService.setEnabled(dto.enabled);
+  }
+
+  @Get('market/trade-volume-adjustment')
+  getMarketTradeVolumeAdjustment() {
+    return this.marketService.getTradeVolumeAdjustment();
+  }
+
+  @Put('market/trade-volume-adjustment')
+  @AdminAction('修改市场交易量调整值')
+  updateMarketTradeVolumeAdjustment(
+    @Body() dto: AdminUpdateMarketVolumeAdjustmentDto,
+  ) {
+    return this.marketService.setTradeVolumeAdjustment(dto.amount);
+  }
+
+  @Get('miners')
+  getMiners() {
+    return this.adminService.getMiners();
+  }
+
+  @Post('miners')
+  @AdminAction('创建矿机')
+  createMiner(@Body() dto: AdminCreateMinerDto) {
+    return this.adminService.createMiner(dto);
+  }
+
+  @Patch('miners/:minerId')
+  @AdminAction('修改矿机')
+  updateMiner(
+    @Param('minerId') minerId: string,
+    @Body() dto: AdminUpdateMinerDto,
+  ) {
+    return this.adminService.updateMiner(minerId, dto);
+  }
+
+  @Post('miners/batch-accelerate')
+  @AdminAction('批量加速矿机出局')
+  batchAccelerateAccountMiners(@Body() dto: AdminBatchAccelerateMinersDto) {
+    return this.adminService.batchAccelerateAccountMiners(dto);
+  }
+
+  @Get('stats/today-miner-purchase-space')
+  getTodayMinerPurchaseSpace() {
+    return this.adminService.getTodayMinerPurchaseSpace();
+  }
+
+  @Get('stats/active-users')
+  getActiveUserCount() {
+    return this.adminService.getActiveUserCount();
+  }
+
+  @Get('stats/miners')
+  getMinerCount() {
+    return this.adminService.getMinerCount();
+  }
+
+  @Get('stats/user-balances')
+  getUserBalanceTotals() {
+    return this.adminService.getUserBalanceTotals();
+  }
+
+  @Get('stats/estimated-miner-rewards')
+  getEstimatedMinerRewards() {
+    return this.adminService.getEstimatedMinerRewards();
+  }
+
+  @Patch('configs/:key')
+  @AdminAction('修改配置')
+  updateConfig(@Param('key') key: string, @Body() dto: AdminUpdateConfigDto) {
+    return this.adminService.updateConfig(key, dto);
+  }
+
+  @Get('notices')
+  getNotices(@Query() query: AdminPageQueryDto) {
+    return this.adminService.getNotices(query);
+  }
+
+  @Post('notices')
+  @AdminAction('创建公告')
+  createNotice(@Body() dto: AdminCreateNoticeDto) {
+    return this.adminService.createNotice(dto);
+  }
+
+  @Patch('notices/:noticeId')
+  @AdminAction('修改公告')
+  updateNotice(
+    @Param('noticeId', ParseIntPipe) noticeId: number,
+    @Body() dto: AdminUpdateNoticeDto,
+  ) {
+    return this.adminService.updateNotice(noticeId, dto);
+  }
+
+  @Delete('notices/:noticeId')
+  @AdminAction('删除公告')
+  deleteNotice(@Param('noticeId', ParseIntPipe) noticeId: number) {
+    return this.adminService.deleteNotice(noticeId);
+  }
+
+  @Patch('dividend-rules/:category/:token')
+  @AdminAction('修改分红规则')
+  updateDividendRule(
+    @Param('category') category: DividendRuleCategory,
+    @Param('token') token: AccountBalanceLogToken,
+    @Body() dto: AdminUpdateDividendRuleDto,
+  ) {
+    return this.adminService.updateDividendRuleGroup(category, token, dto);
+  }
+
+  @Get('dividend-logs')
+  getDividendLogs(@Query() query: AdminPageQueryDto) {
+    return this.adminService.getDividendLogs(query);
+  }
+
+  @Get('dividends/rounds')
+  getDividendRounds(@Query() query: AdminPageQueryDto) {
+    return this.adminService.getDividendRounds(query);
+  }
+
+  @Get('dividends/rounds/:roundAt')
+  getDividendRoundDetail(@Param('roundAt', ParseIntPipe) roundAt: number) {
+    return this.adminService.getDividendRoundDetail(roundAt);
+  }
+
+  @Patch('users/:accountId/levels')
+  @AdminAction('修改用户等级')
+  updateUserLevels(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() dto: AdminUpdateUserLevelsDto,
+  ) {
+    return this.adminService.updateUserLevels(accountId, dto);
+  }
+
+  @Put('users/:accountId/market-maker-whitelist')
+  @AdminAction('修改做市商申请白名单')
+  updateMarketMakerWhitelist(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() dto: AdminUpdateMarketMakerWhitelistDto,
+  ) {
+    return this.adminService.updateMarketMakerWhitelist(accountId, dto.enabled);
+  }
+
+  @Get('users/:accountId/balance-logs')
+  getUserBalanceLogs(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Query() query: BalanceLogQueryDto,
+  ) {
+    return this.adminService.getUserBalanceLogs(accountId, query);
+  }
+
+  @Post('users/:accountId/system-reward')
+  @AdminAction('增加系统奖励')
+  addUserSystemReward(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() dto: AdminAddSystemRewardDto,
+  ) {
+    return this.adminService.addUserSystemReward(accountId, dto);
+  }
+
+  @Post('users/:accountId/transfer')
+  @AdminAction('后台用户转账')
+  transferUserBalance(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() dto: AdminTransferUserBalanceDto,
+  ) {
+    return this.adminService.transferUserBalance(accountId, dto);
+  }
+
+  @Delete('users/:accountId')
+  @AdminAction('删除用户')
+  deleteUser(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Body() dto: AdminDeleteUserDto,
+  ) {
+    return this.adminService.deleteUser(accountId, dto);
+  }
+
+  @Get('users/:accountId/team/overview')
+  getUserTeamOverview(@Param('accountId', ParseIntPipe) accountId: number) {
+    return this.adminService.getUserTeamOverview(accountId);
+  }
+
+  @Get('users/:accountId/team/addresses')
+  getUserTeamAddresses(@Param('accountId', ParseIntPipe) accountId: number) {
+    return this.adminService.getUserTeamAddresses(accountId);
+  }
+
+  @Get('users/:accountId/team/miner-purchase-stats')
+  getUserTeamMinerPurchaseStats(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Query() query: AdminTeamMinerPurchaseStatsQueryDto,
+  ) {
+    return this.adminService.getUserTeamMinerPurchaseStats(accountId, query);
+  }
+
+  @Get('users/:accountId/team/branches')
+  getUserTeamBranches(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Query() query: AdminPageQueryDto,
+  ) {
+    return this.adminService.getUserTeamBranches(accountId, query);
+  }
+
+  @Get('users/:accountId/team/members')
+  getUserTeamMembers(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Query() query: AdminTeamMembersQueryDto,
+  ) {
+    return this.adminService.getUserTeamMembers(accountId, query);
+  }
+
+  @Get('users/:accountId/miners')
+  getUserMiners(@Param('accountId', ParseIntPipe) accountId: number) {
+    return this.adminService.getUserMiners(accountId);
+  }
+
+  @Post('users/:accountId/miners/:accountMinerId/accelerate')
+  @AdminAction('加速用户矿机')
+  accelerateUserMiner(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Param('accountMinerId', ParseIntPipe) accountMinerId: number,
+    @Body() dto: AdminAccelerateMinerDto,
+  ) {
+    return this.adminService.accelerateUserMiner(
+      accountId,
+      accountMinerId,
+      dto,
+    );
+  }
+}

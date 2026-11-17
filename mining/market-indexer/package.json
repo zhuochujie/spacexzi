@@ -1,0 +1,32 @@
+{
+  "name": "market-indexer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/ponder.cjs dev",
+    "start": "node scripts/ponder.cjs start",
+    "db": "node scripts/ponder.cjs db",
+    "codegen": "node scripts/ponder.cjs codegen",
+    "serve": "node scripts/ponder.cjs serve",
+    "lint": "eslint .",
+    "typecheck": "tsc",
+    "test:env": "node --test scripts/ponder.test.cjs"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.8.0",
+    "hono": "^4.5.0",
+    "ponder": "^0.16.6",
+    "viem": "^2.21.3",
+    "zod": "^3.25.76",
+    "dotenv": "^16.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "eslint": "^8.54.0",
+    "eslint-config-ponder": "^0.16.6",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=18.14"
+  }
+}

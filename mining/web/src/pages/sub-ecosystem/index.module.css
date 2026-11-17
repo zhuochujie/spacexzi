@@ -1,0 +1,304 @@
+.page {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #FFFFFF;
+    background: #020817;
+}
+
+.background {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 64% top;
+    opacity: 0.9;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 76% 13%, rgba(40, 109, 255, 0.2), transparent 30%),
+        linear-gradient(180deg, rgba(2, 8, 23, 0.06) 0%, rgba(2, 8, 23, 0.62) 36%, rgba(2, 8, 23, 0.9) 100%),
+        linear-gradient(90deg, rgba(2, 8, 23, 0.84) 0%, rgba(2, 8, 23, 0.48) 48%, rgba(2, 8, 23, 0.1) 100%);
+}
+
+.header {
+    position: relative;
+    z-index: 1;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+}
+
+.header button {
+    position: absolute;
+    left: 14px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: none;
+    background: transparent;
+}
+
+.header button > span {
+    width: 14px;
+    height: 14px;
+    border-left: 3px solid #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    transform: rotate(45deg);
+}
+
+.header strong {
+    color: #FFFFFF;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    min-height: calc(100vh - 46px);
+    padding: 30px 16px 28px;
+}
+
+.hero {
+    max-width: 320px;
+}
+
+.hero h1 {
+    margin: 0;
+    font-family: AlimamaShuHeiTi;
+    font-size: 42px;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: 0;
+    background: linear-gradient(180deg, #FFFFFF 0%, #C6D8FF 48%, #B96BFF 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero h2 {
+    margin: 8px 0 0;
+    color: #DDE7FF;
+    font-size: 18px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.hero_line {
+    display: block;
+    width: 34px;
+    height: 2px;
+    margin: 14px 0 14px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7A5BFF 0%, #39D9FF 100%);
+    box-shadow: 0 0 12px rgba(89, 127, 255, 0.7);
+}
+
+.hero p {
+    margin: 0;
+    color: #AAB8DA;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.tags span {
+    min-width: 62px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    color: #C7D4F3;
+    font-size: 11px;
+    line-height: 1;
+    border: 1px solid rgba(100, 157, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(16, 42, 83, 0.58);
+    box-shadow: inset 0 0 18px rgba(64, 128, 255, 0.1);
+    backdrop-filter: blur(8px);
+}
+
+.steps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.steps::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    bottom: 22px;
+    left: 18px;
+    width: 1px;
+    background: linear-gradient(180deg, #7C64FF 0%, #34D8FF 46%, #F6D56D 100%);
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(76, 201, 255, 0.66);
+}
+
+.step {
+    position: relative;
+    min-height: 70px;
+    display: grid;
+    grid-template-columns: 42px 52px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 0;
+    border: 1px solid rgba(59, 127, 255, 0.16);
+    border-radius: 8px;
+    background:
+        linear-gradient(90deg, rgba(13, 33, 72, 0.78) 0%, rgba(5, 22, 51, 0.72) 62%, rgba(12, 52, 95, 0.48) 100%);
+    box-shadow:
+        inset 0 0 28px rgba(55, 118, 255, 0.08),
+        0 10px 24px rgba(0, 8, 26, 0.24);
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+}
+
+.step_number {
+    position: relative;
+    display: block;
+    padding-left: 10px;
+    color: #A7F4FF;
+    font-family: AlimamaShuHeiTi;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 700;
+    text-shadow: 0 0 12px rgba(65, 211, 255, 0.8);
+}
+
+.step_number::before,
+.step_number::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #72ECFF;
+    box-shadow: 0 0 10px #72ECFF;
+}
+
+.step_number::before {
+    top: -20px;
+}
+
+.step_number::after {
+    bottom: -20px;
+}
+
+.step_icon {
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    align-self: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step_icon img {
+    width: 50px;
+    height: 50px;
+    display: block;
+    object-fit: contain;
+}
+
+.step_text {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    padding-right: 78px;
+}
+
+.step_text h3 {
+    margin: 0 0 4px;
+    color: #FFFFFF;
+    font-size: 17px;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+.step_text p {
+    margin: 0;
+    color: #B7C5E2;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.step_art {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 118px;
+    height: 100%;
+    object-fit: cover;
+    object-position: center right;
+    opacity: 0.92;
+    pointer-events: none;
+}
+
+.coming_soon {
+    margin-top: 24px;
+    padding: 20px 20px 0;
+    text-align: center;
+}
+
+.coming_soon strong {
+    display: block;
+    color: #DFF8FF;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 8px;
+    text-indent: 8px;
+}
+
+.coming_soon span {
+    display: block;
+    margin-top: 10px;
+    color: #D5E1F8;
+    font-size: 13px;
+    line-height: 1.4;
+    letter-spacing: 5px;
+    text-indent: 5px;
+}
+
+.coming_soon em {
+    display: block;
+    width: 34px;
+    height: 2px;
+    margin: 16px auto 14px;
+    border-radius: 999px;
+    background: #8A6DFF;
+    box-shadow: 0 0 12px rgba(130, 111, 255, 0.8);
+}
+
+.coming_soon p {
+    margin: 0;
+    color: rgba(191, 203, 229, 0.54);
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 4px;
+    text-indent: 4px;
+}

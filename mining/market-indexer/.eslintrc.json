@@ -1,0 +1,26 @@
+{
+  "extends": "ponder",
+  "overrides": [
+    {
+      "files": [
+        "scripts/**/*.cjs"
+      ],
+      "parser": "espree",
+      "parserOptions": {
+        "project": null,
+        "ecmaVersion": 2022,
+        "sourceType": "script"
+      },
+      "env": {
+        "node": true,
+        "es2022": true
+      },
+      "extends": [
+        "eslint:recommended"
+      ],
+      "rules": {
+        "@typescript-eslint/no-floating-promises": "off"
+      }
+    }
+  ]
+}

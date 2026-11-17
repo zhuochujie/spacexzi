@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 56 56" fill="none">
+  <defs>
+    <linearGradient id="buybackGradient" x1="13" y1="16" x2="59" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12C8FF"/>
+      <stop offset="1" stop-color="#8064FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M57.5 29.5A23 23 0 0 0 18.3 20l-4.8 5.1h10.9v-5.5l-2.1 2.2a17.5 17.5 0 0 1 29.9 7.7h5.3Z" fill="url(#buybackGradient)"/>
+  <path d="M14.5 42.5A23 23 0 0 0 53.7 52l4.8-5.1H47.6v5.5l2.1-2.2a17.5 17.5 0 0 1-29.9-7.7h-5.3Z" fill="url(#buybackGradient)"/>
+  <path d="m36 24 11 6.2v11.6L36 48l-11-6.2V30.2L36 24Zm0 6-5.3 3 5.3 3 5.3-3-5.3-3Zm-6 7.5v2.1l3.3 1.9v-2.1L30 37.5Zm8.7 1.9v2.1l3.3-1.9v-2.1l-3.3 1.9Z" fill="url(#buybackGradient)"/>
+</svg>

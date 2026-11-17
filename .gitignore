@@ -1,0 +1,30 @@
+# 原子项目 Git 历史本地备份
+/.git-backups/
+
+# 系统文件与编辑器
+.DS_Store
+.idea/
+
+# 私有环境配置，仅跟踪示例
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# 依赖与构建结果
+node_modules/
+dist/
+dist-ssr/
+out/
+cache/
+coverage/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+
+# 本地运行与部署数据
+.ponder/
+broadcast/
+deployments/
+*.log
+*.pid

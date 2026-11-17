@@ -1,0 +1,149 @@
+import MiningStartNotice from '../mining-start-notice'
+import type { PurchaseMinerMethod } from '../../api'
+import { useI18n } from '../../i18n'
+import type { MinerPurchaseState } from '../../hooks/useMinerPurchase'
+import { formatAmount } from '../../utils/format'
+import Modal from '../modal'
+import styles from './index.module.css'
+
+type MinerPaymentModalProps = {
+    purchase: MinerPurchaseState
+}
+
+function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
+    const { t } = useI18n()
+    const { selectedMiner, successMiner } = purchase
+
+    return (
+        <>
+            <Modal
+                open={Boolean(selectedMiner)}
+                title="home.paymentTitle"
+                confirmText="home.confirmPurchase"
+                confirmLoading={Boolean(purchase.buyingMinerId)}
+                confirmDisabled={
+                    !selectedMiner ||
+                    purchase.balanceLoading ||
+                    Boolean(purchase.buyingMinerId) ||
+                    !purchase.isBalanceEnough(
+                        purchase.activePaymentMethod,
+                        selectedMiner,
+                    )
+                }
+                onCancel={purchase.closePaymentModal}
+                onConfirm={purchase.handleConfirmPayment}
+            >
+                {selectedMiner && (
+                    <div className={styles.payment_modal}>
+                        <MiningStartNotice />
+                        <div className={styles.payment_summary}>
+                            <span>{selectedMiner.name}</span>
+                            <span>
+                                {formatAmount(selectedMiner.price, {
+                                    display: true,
+                                    fractionDigits: 3,
+                                })}{' '}
+                                SPACE
+                            </span>
+                        </div>
+                        {[
+                            {
+                                value: 'wallet_balance',
+                                label: t('home.walletBalance'),
+                                balance: purchase.walletSpaceBalance,
+                                token: 'SPACE',
+                            },
+                            {
+                                value: 'internal_balance',
+                                label: t('home.accountBalance'),
+                                balance: purchase.internalBalance,
+                                token: 'SPACE',
+                            },
+                            {
+                                value: 'internal_and_wallet_balance',
+                                label: t('home.accountAndWallet'),
+                                balance:
+                                    purchase.internalBalance +
+                                    purchase.walletSpaceBalance,
+                                token: 'SPACE',
+                            },
+                        ].map((item) => {
+                            const value = item.value as PurchaseMinerMethod
+                            const enough = purchase.isBalanceEnough(
+                                value,
+                                selectedMiner,
+                            )
+
+                            return (
+                                <button
+                                    className={`${styles.payment_option} ${purchase.activePaymentMethod === value ? styles.payment_active : ''}`}
+                                    type="button"
+                                    key={value}
+                                    onClick={() =>
+                                        purchase.setPaymentMethod(value)
+                                    }
+                                >
+                                    <div>
+                                        <span>{item.label}</span>
+                                        <span>
+                                            {formatAmount(item.balance, {
+                                                display: true,
+                                            })}{' '}
+                                            {item.token}
+                                        </span>
+                                    </div>
+                                    <span
+                                        className={
+                                            enough
+                                                ? styles.enough
+                                                : styles.not_enough
+                                        }
+                                    >
+                                        {enough
+                                            ? t('home.available')
+                                            : t('home.notEnough')}
+                                    </span>
+                                </button>
+                            )
+                        })}
+                    </div>
+                )}
+            </Modal>
+            <Modal
+                open={Boolean(successMiner)}
+                title={
+                    purchase.successMode === 'reinvest'
+                        ? 'home.reinvestSuccess'
+                        : 'home.purchaseSuccess'
+                }
+                confirmText="miner.myMiners"
+                onCancel={purchase.closeSuccessModal}
+                onConfirm={purchase.goToMyMiners}
+            >
+                {successMiner && (
+                    <div className={styles.success_modal}>
+                        <img
+                            src={`/miners/${successMiner.id}.webp`}
+                            alt={successMiner.name}
+                            onError={(event) => {
+                                event.currentTarget.src =
+                                    '/miners/SPACE_100.webp'
+                            }}
+                        />
+                        <strong>{successMiner.name}</strong>
+                        <span>
+                            {t(
+                                purchase.successMode === 'reinvest'
+                                    ? 'home.reinvestSuccessWithName'
+                                    : 'home.purchaseSuccessWithName',
+                                { name: successMiner.name },
+                            )}
+                        </span>
+                    </div>
+                )}
+            </Modal>
+        </>
+    )
+}
+
+export default MinerPaymentModal
