@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../utils/token'
 import MiningStartNotice from '../mining-start-notice'
 import type { PurchaseMinerMethod } from '../../api'
 import { useI18n } from '../../i18n'
@@ -37,13 +38,13 @@ function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
                     <div className={styles.payment_modal}>
                         <MiningStartNotice />
                         <div className={styles.payment_summary}>
-                            <span>{selectedMiner.name}</span>
+                            <span>{formatTokenSymbol(selectedMiner.name)}</span>
                             <span>
                                 {formatAmount(selectedMiner.price, {
                                     display: true,
                                     fractionDigits: 3,
                                 })}{' '}
-                                SPACE
+                                SpaceXZI
                             </span>
                         </div>
                         {[
@@ -89,7 +90,7 @@ function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
                                             {formatAmount(item.balance, {
                                                 display: true,
                                             })}{' '}
-                                            {item.token}
+                                            {formatTokenSymbol(item.token)}
                                         </span>
                                     </div>
                                     <span
@@ -123,20 +124,20 @@ function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
                 {successMiner && (
                     <div className={styles.success_modal}>
                         <img
-                            src={`/miners/${successMiner.id}.webp`}
-                            alt={successMiner.name}
+                            src={`/miners/${successMiner.id}.svg`}
+                            alt={formatTokenSymbol(successMiner.name)}
                             onError={(event) => {
                                 event.currentTarget.src =
-                                    '/miners/SPACE_100.webp'
+                                    '/miners/SPACE_100.svg'
                             }}
                         />
-                        <strong>{successMiner.name}</strong>
+                        <strong>{formatTokenSymbol(successMiner.name)}</strong>
                         <span>
                             {t(
                                 purchase.successMode === 'reinvest'
                                     ? 'home.reinvestSuccessWithName'
                                     : 'home.purchaseSuccessWithName',
-                                { name: successMiner.name },
+                                { name: formatTokenSymbol(successMiner.name) },
                             )}
                         </span>
                     </div>

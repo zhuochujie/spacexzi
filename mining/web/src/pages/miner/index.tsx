@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../utils/token'
 import { getMinerPresentation, freeMinerImage, fallbackMinerImage } from '../../utils/miner-presentation'
 import { useEffect, useState, type CSSProperties } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -18,8 +19,8 @@ import MinerPaymentModal from "../../components/miner-payment-modal"
 import SkeletonText from "../../components/skeleton-text"
 import { useMinerPurchase } from "../../hooks/useMinerPurchase"
 import styles from "./index.module.css"
-import Accelerate from './images/accelerate.webp'
-import MinerIcon from './images/miner.webp'
+import Accelerate from './images/accelerate.svg'
+import MinerIcon from './images/miner.svg'
 import Arrow from './images/arrow.svg'
 import DetailsIcon from './images/details.svg'
 
@@ -188,14 +189,14 @@ function MinerPage() {
                 <div className={styles.data_con}>
                     <span>{t('miner.myRights')}</span>
                     <div className={styles.total}>
-                        <span>{pageLoading ? <SkeletonText width={92} height={20} /> : formatAmount(totalRemainingReward, { display: true })} <span>SPACE</span></span>
+                        <span>{pageLoading ? <SkeletonText width={92} height={20} /> : formatAmount(totalRemainingReward, { display: true })} <span>SpaceXZI</span></span>
                     </div>
                     <div className={styles.sub}>
                         <div>
                             <img src={MinerIcon} alt="" />
                             <div>
                                 <span>{t('miner.minerReward')}</span>
-                                <span>{pageLoading ? <SkeletonText width={66} height={13} /> : formatAmount(totalMinerReward, { display: true })} <span>SPACE</span></span>
+                                <span>{pageLoading ? <SkeletonText width={66} height={13} /> : formatAmount(totalMinerReward, { display: true })} <span>SpaceXZI</span></span>
                             </div>
                         </div>
 
@@ -203,7 +204,7 @@ function MinerPage() {
                             <img src={Accelerate} alt="" />
                             <div>
                                 <span>{t('miner.teamReward')}</span>
-                                <span>{pageLoading ? <SkeletonText width={66} height={13} /> : formatAmount(teamReward, { display: true })} <span>SPACE</span></span>
+                                <span>{pageLoading ? <SkeletonText width={66} height={13} /> : formatAmount(teamReward, { display: true })} <span>SpaceXZI</span></span>
                             </div>
                         </div>
                     </div>
@@ -282,7 +283,7 @@ function MinerPage() {
                         <div className={styles.miner} key={`${item.type}-${miner.id}`}>
                             <img
                                 src={minerImage}
-                                alt={minerName}
+                                alt={formatTokenSymbol(minerName)}
                                 onError={(event) => {
                                     if (!event.currentTarget.src.endsWith(fallbackMinerImage)) {
                                                     event.currentTarget.src = fallbackMinerImage
@@ -291,7 +292,7 @@ function MinerPage() {
                             />
                             <div className={styles.miner_info}>
                                 <span className={styles.miner_name}>
-                                    {minerName}
+                                    {formatTokenSymbol(minerName)}
                                     {item.type === 'free' && <em>{t('common.free')}</em>}
                                 </span>
                                 <span className={styles.miner_desc}>{minerDesc}</span>
@@ -309,7 +310,7 @@ function MinerPage() {
                                     </div>
                                 </div>
                                 <span className={styles.miner_output}>
-                                    {t('miner.produced')} <span>{formatAmount(miner.producedReward, { display: true })} SPACE</span> / {t('miner.total')} {formatAmount(miner.expectedReward, { display: true })} SPACE
+                                    {t('miner.produced')} <span>{formatAmount(miner.producedReward, { display: true })} SpaceXZI</span> / {t('miner.total')} {formatAmount(miner.expectedReward, { display: true })} SpaceXZI
                                 </span>
                             </div>
                             <div className={styles.miner_status}>

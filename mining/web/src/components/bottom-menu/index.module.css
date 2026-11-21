@@ -35,3 +35,13 @@
 .placeholder {
     height: 100px;
 }
+
+/* Technology blue visual system */
+
+.menu_con { z-index: 40; left: 12px; right: 12px; bottom: max(12px,env(safe-area-inset-bottom)); width: auto; padding: 6px; border: 1px solid #285378; border-radius: 20px; background: #0b2036f2; backdrop-filter: blur(18px); box-shadow: 0 8px 36px #000b1c80; gap: 3px; }
+.menu_con > button { flex: 1; min-width: 0; min-height: 52px; border: 0; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: #8ba6c4; background: transparent; }
+.menu_con > button[aria-current="page"] { background: #13416a; color: #7ee3ff; }
+.menu_con > button > img { width: 21px; height: 21px; }
+.menu_con > button > span { font-size: 9px; line-height: 1.2; }
+.menu_active { color: #7ee3ff; }
+.placeholder { height: 100px; }

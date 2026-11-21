@@ -1,3 +1,5 @@
+import { formatTokenSymbol } from '../../utils/token'
+import { freeMinerImage, fallbackMinerImage, getMinerPresentation } from '../../utils/miner-presentation'
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import copy from "copy-to-clipboard"
@@ -63,7 +65,7 @@ function TeamPage() {
                 </div>
                 <div>
                     <span>{t('team.performance')}</span>
-                    <strong>{loading ? <SkeletonText width={84} height={15} /> : `${formatAmount(data?.totalPerformance ?? '0', { display: true })} SPACE`}</strong>
+                    <strong>{loading ? <SkeletonText width={84} height={15} /> : `${formatAmount(data?.totalPerformance ?? '0', { display: true })} SpaceXZI`}</strong>
                 </div>
             </div>
 
@@ -128,7 +130,7 @@ function TeamPage() {
                             </div>
                             <div>
                                 <span>{t('team.branchPerformance')}</span>
-                                <strong>{formatAmount(member.performance, { display: true })} SPACE</strong>
+                                <strong>{formatAmount(member.performance, { display: true })} SpaceXZI</strong>
                             </div>
                         </div>
                     </div>
@@ -147,13 +149,13 @@ function TeamPage() {
                     {(minerMember?.miners ?? []).map((miner) => (
                         <div className={styles.miner_item} key={`${miner.type}-${miner.id}`}>
                             <img
-                                src={`/miners/${miner.minerId}.webp`}
-                                alt={miner.name}
+                                src={miner.type === 'free' ? freeMinerImage : getMinerPresentation(miner.minerId, '').image}
+                                alt={formatTokenSymbol(miner.name)}
                                 onError={(event) => {
-                                    event.currentTarget.src = '/miners/SPACE_100.webp'
+                                    if (!event.currentTarget.src.endsWith(fallbackMinerImage)) event.currentTarget.src = fallbackMinerImage
                                 }}
                             />
-                            <strong>{miner.name}</strong>
+                            <strong>{formatTokenSymbol(miner.name)}</strong>
                         </div>
                     ))}
                 </div>

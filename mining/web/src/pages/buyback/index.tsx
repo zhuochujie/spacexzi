@@ -1,3 +1,5 @@
+import SpaceIcon from '../personal/images/token2.svg'
+import UsdtIcon from '../personal/images/USDT.svg'
 import { getBuybackOverview } from '../../web3/buyback'
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -264,8 +266,8 @@ export default function BuybackPage() {
                                     }}
                                 />
                                 <span className={styles.token}>
-                                    <em>{isBuy ? '₮' : 'S'}</em>
-                                    {isBuy ? 'USDT' : 'SPACE'}
+                                    <img src={isBuy ? UsdtIcon : SpaceIcon} alt="" />
+                                    {isBuy ? 'USDT' : "SpaceXZI"}
                                 </span>
                             </div>
                             <div className={styles.balanceRow}>
@@ -303,8 +305,8 @@ export default function BuybackPage() {
                                     {display(receive, 6)}
                                 </output>
                                 <span className={styles.token}>
-                                    <em>{isBuy ? 'S' : '₮'}</em>
-                                    {isBuy ? 'SPACE' : 'USDT'}
+                                    <img src={isBuy ? SpaceIcon : UsdtIcon} alt="" />
+                                    {isBuy ? "SpaceXZI" : 'USDT'}
                                 </span>
                             </div>
                             <div className={styles.balanceRow}>
@@ -318,7 +320,7 @@ export default function BuybackPage() {
                         </div>
                         <div className={styles.rate}>
                             <span>
-                                1 SPACE ={' '}
+                                1 SpaceXZI ={' '}
                                 {data
                                     ? display(isBuy ? buyPrice : sellPrice)
                                     : '—'}{' '}
@@ -363,29 +365,23 @@ export default function BuybackPage() {
                             <span>{t('swap.payActual')}</span>
                             <strong>
                                 {display(isBuy ? usdtAmount : spaceAmount)}{' '}
-                                {isBuy ? 'USDT' : 'SPACE'}
+                                {isBuy ? 'USDT' : "SpaceXZI"}
                             </strong>
                         </div>
                         <div>
                             <span>{t('swap.quota')}</span>
                             <strong>
                                 {data ? display(data.feeExemptQuota) : '—'}{' '}
-                                SPACE
+                                SpaceXZI
                             </strong>
                         </div>
                         {isBuy && (
                             <div>
                                 <span>{t('swap.addQuota')}</span>
-                                <strong>{display(spaceAmount)} SPACE</strong>
+                                <strong>{display(spaceAmount)} SpaceXZI</strong>
                             </div>
                         )}
                     </details>
-                    <button
-                        className={styles.rankLink}
-                        onClick={() => setTab('ranking')}
-                    >
-                        {t('swap.ranking')} <span>↗</span>
-                    </button>
                 </>
             )}
             {tab === 'ranking' && (
@@ -422,7 +418,7 @@ export default function BuybackPage() {
                     )}
                     <div className={styles.tableHeader}>
                         <span>{t('swap.trader')}</span>
-                        <span>{t('swap.volume')} SPACE</span>
+                        <span>{t('swap.volume')} SpaceXZI</span>
                         <span>{t('swap.estimatedReward')} USDT</span>
                     </div>
                     {ranking.data?.items.map((item) => (
@@ -509,8 +505,8 @@ export default function BuybackPage() {
                         <h2 id="buyback-confirm-title">{t('swap.confirm')}</h2>
                         <p>
                             {display(isBuy ? usdtAmount : spaceAmount)}{' '}
-                            {isBuy ? 'USDT' : 'SPACE'} → {display(receive)}{' '}
-                            {isBuy ? 'SPACE' : 'USDT'}
+                            {isBuy ? 'USDT' : "SpaceXZI"} → {display(receive)}{' '}
+                            {isBuy ? "SpaceXZI" : 'USDT'}
                         </p>
                         <div className={styles.confirmActions}>
                             <button

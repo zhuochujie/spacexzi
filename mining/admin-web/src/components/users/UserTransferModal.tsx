@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import { useEffect, useState, type FormEvent } from 'react'
 import { formatUnits, parseUnits } from 'viem'
 import type { UserRecord, UserTransferResult } from '../../api'
@@ -90,7 +91,7 @@ export function UserTransferModal({
     try {
       amountWei = parseUnits(amount.trim(), 18)
     } catch {
-      setLocalError(`请输入有效的 ${token} 数量。`)
+      setLocalError(`请输入有效的 ${formatTokenSymbol(token)} 数量。`)
       return
     }
 
@@ -138,12 +139,12 @@ export function UserTransferModal({
                 disabled={busy}
               >
                 <option value="USDT">USDT</option>
-                <option value="SPACE">SPACE</option>
+                <option value="SPACE">SpaceXZI</option>
               </select>
             </div>
             <div className="field compact">
-              <label>当前{token}余额</label>
-              <strong>{formatAmount(currentBalance, { display: true })} {token}</strong>
+              <label>当前{formatTokenSymbol(token)}余额</label>
+              <strong>{formatAmount(currentBalance, { display: true })} {formatTokenSymbol(token)}</strong>
             </div>
             <div className="field compact field-editable">
               <label htmlFor="user-transfer-address">目标地址</label>
@@ -156,7 +157,7 @@ export function UserTransferModal({
               />
             </div>
             <div className="field compact field-editable">
-              <label htmlFor="user-transfer-amount">转账数量（{token}）</label>
+              <label htmlFor="user-transfer-amount">转账数量（{formatTokenSymbol(token)}）</label>
               <div className="input-with-action">
                 <input
                   id="user-transfer-amount"

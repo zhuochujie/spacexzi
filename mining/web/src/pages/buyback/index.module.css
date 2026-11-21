@@ -8,7 +8,6 @@
 .nav,
 .card,
 .details,
-.rankLink,
 .list {
     max-width: 28rem;
     margin-inline: auto;
@@ -174,7 +173,7 @@
     border-radius: 1.1rem;
     padding: 1rem;
     color: #ecc6f4;
-    background: #572847;
+    background: #283F57;
     font-size: 1rem;
     font-weight: 600;
 }
@@ -206,17 +205,7 @@
     font-weight: 500;
     color: #c8d1e5;
 }
-.rankLink {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    margin-top: 0.5rem;
-    background: transparent;
-    border: 0;
-    border-top: 1px solid #232e44;
-    padding: 1rem 0.2rem;
-    color: #b9c5df;
-}
+
 .list h2 {
     font-size: 1.1rem;
     margin-bottom: 0.8rem;
@@ -357,3 +346,24 @@
     gap: 0.4rem;
     min-width: 0;
 }
+
+/* Technology blue visual system */
+
+.page { background: radial-gradient(ellipse at 50% 0,#102f50,transparent 36rem),#061321; }
+.header h1 { font-size: 1.6rem; letter-spacing: -.03em; }
+.network { color: #7ddcff; border-color: #285c82; background: #0a2640; }
+.nav { padding: .35rem; gap: .25rem; border: 1px solid #224e74; background: #081c30; border-radius: 1rem; }
+.nav button { flex: 1; min-height: 2.6rem; padding: .5rem; border-radius: .7rem; }
+.nav button[aria-selected="true"] { background: #175a96; color: #e6faff; }
+.card { border: 1px solid #2a5b83; background: #0b2139; border-radius: 1.5rem; box-shadow: 0 1rem 3rem #000c1e50; }
+
+.nav button.selected { background: #175a96; color: #e6faff; }
+.amountCard { background: #0d2c49; border: 1px solid #245476; }
+.modes { background: #071a2d; }
+.modes button.active { background: #175a96; }
+
+.token img { width: 1.4rem; height: 1.4rem; object-fit: contain; }
+/* Keep the longer token symbol readable on narrow screens. */
+.cardHeader { display: grid; grid-template-columns: minmax(0,1fr); gap: .6rem; }
+.cardHeader > span { justify-self: end; }
+.modes button { flex: 1; white-space: nowrap; }

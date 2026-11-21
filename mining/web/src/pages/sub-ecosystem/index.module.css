@@ -79,7 +79,7 @@
     line-height: 1.08;
     font-weight: 700;
     letter-spacing: 0;
-    background: linear-gradient(180deg, #FFFFFF 0%, #C6D8FF 48%, #B96BFF 100%);
+    background: linear-gradient(180deg, #FFFFFF 0%, #C6D8FF 48%, #6BB4FF 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -99,7 +99,7 @@
     height: 2px;
     margin: 14px 0 14px;
     border-radius: 999px;
-    background: linear-gradient(90deg, #7A5BFF 0%, #39D9FF 100%);
+    background: linear-gradient(90deg, #5BABFF 0%, #39D9FF 100%);
     box-shadow: 0 0 12px rgba(89, 127, 255, 0.7);
 }
 
@@ -149,7 +149,7 @@
     bottom: 22px;
     left: 18px;
     width: 1px;
-    background: linear-gradient(180deg, #7C64FF 0%, #34D8FF 46%, #F6D56D 100%);
+    background: linear-gradient(180deg, #64B0FF 0%, #34D8FF 46%, #F6D56D 100%);
     opacity: 0.8;
     box-shadow: 0 0 10px rgba(76, 201, 255, 0.66);
 }
@@ -290,7 +290,7 @@
     height: 2px;
     margin: 16px auto 14px;
     border-radius: 999px;
-    background: #8A6DFF;
+    background: #6DB5FF;
     box-shadow: 0 0 12px rgba(130, 111, 255, 0.8);
 }
 

@@ -12,14 +12,13 @@ import {
     getNodeNonce,
     purchaseNode,
     submitNodeNonce,
-    type NodeSignature,
 } from '../../node-api'
 import { appChain, appChainId, ensureAppChain, wagmiConfig } from '../../web3/config'
 import { node, usdtToken } from '../../web3/constants'
 import { getNodeChainOverview } from '../../web3/node'
 import { getFriendlyErrorKey, useI18n } from '../../i18n'
-import logo from './logo.png'
-import art from './node.png'
+import logo from '../../assets/brand/spacexzi-logo-transparent.png'
+import art from './node.svg'
 import styles from './landing.module.css'
 
 export default function NodePage() {
@@ -84,7 +83,7 @@ export default function NodePage() {
         Number(
             formatUnits(BigInt(amount), data?.decimals ?? 18),
         ).toLocaleString(({ zh: 'zh-CN', en: 'en-US', th: 'th-TH', ko: 'ko-KR' })[language], { maximumFractionDigits: 4 })
-    async function buy(index: number, resume?: NodeSignature) {
+    async function buy(index: number) {
         if (busy || !data) return
         setBusy(true)
         try {
@@ -94,15 +93,8 @@ export default function NodePage() {
             if (node.address === zeroAddress)
                 throw new Error(t('node.notConfigured'))
             await ensureAppChain(connection)
-            const amount = BigInt(
-                resume?.amount ??
-                    (
-                        BigInt(data.levels[index].price) -
-                        (data.level
-                            ? BigInt(data.levels[data.level - 1].price)
-                            : 0n)
-                    ).toString(),
-            )
+            const amount = BigInt(data.levels[index].price) -
+                (data.level ? BigInt(data.levels[data.level - 1].price) : 0n)
             const balance = await readContract(wagmiConfig, {
                 address: usdtToken,
                 abi: erc20Abi,
@@ -133,7 +125,7 @@ export default function NodePage() {
                     throw new Error(t('common.walletActionFailed'))
             }
             setStage('node.signing')
-            const signature = resume ?? (await purchaseNode(index))
+            const signature = await purchaseNode(index)
             if (signature.deadline <= Math.floor(Date.now() / 1000))
                 throw new Error(t('node.expired'))
             setNonce(signature.nonce)
@@ -210,13 +202,16 @@ export default function NodePage() {
     const shortAddress = address
         ? `${address.slice(0, 6)}...${address.slice(-4)}`
         : '—'
+    const awaitingConfirmation = Boolean(
+        data?.pending || (pendingNonce && (!status.data || status.data.status === 'pending')),
+    )
     const primaryDisabled =
-        busy || !data || !pending.isSuccess || data.paused || !activeTier || Boolean(data.pending)
+        busy || !data || !pending.isSuccess || data.paused || !activeTier || awaitingConfirmation
     const primaryLabel = busy
         ? t(stage || 'common.processing')
         : data?.paused
           ? t('node.paused')
-          : data?.pending
+          : awaitingConfirmation
             ? t('node.landing.awaiting')
             : data && !selectableLevels.length
               ? t('node.landing.highest')
@@ -247,14 +242,12 @@ export default function NodePage() {
                         aria-label={t('common.back')}
                         onClick={() => navigate('/index')}
                     >
-                        ←
+                        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m10 4-4 4 4 4" /></svg>
                     </button>
-                    <span className={styles['brand-logo']}>
-                        <img src={logo} alt="" />
-                    </span>
                     <div className={styles['brand-text']}>
-                        <strong>SPACE</strong>
-                        <span>{t('node.landing.networkLabel')}</span>
+                        <span className={styles['brand-logo']}>
+                            <img src={logo} alt="SpaceXZI" />
+                        </span>
                     </div>
                 </div>
                 <span
@@ -324,7 +317,7 @@ export default function NodePage() {
                                         !tier.enabled ||
                                         busy ||
                                         !pending.isSuccess ||
-                                        Boolean(data.pending)
+                                        awaitingConfirmation
                                     }
                                     onClick={() =>
                                         setSelectedTierIndex(tier.index)
@@ -405,40 +398,6 @@ export default function NodePage() {
                             {primaryLabel}
                         </button>
                     </div>
-                    {(data?.pending ||
-                        (pendingNonce &&
-                            status.data?.status === 'pending')) && (
-                        <div role="status" className={styles['pending-state']}>
-                            <p className={styles['micro-note']}>
-                                {t('node.pending')}
-                            </p>
-                            {data?.pending && (
-                                <button
-                                    type="button"
-                                    className={styles['referral-trigger']}
-                                    disabled={busy || data.paused}
-                                    onClick={() =>
-                                        void buy(
-                                            data.pending!.targetLevelIndex,
-                                            data.pending!,
-                                        )
-                                    }
-                                >
-                                    {t('node.resume')}
-                                </button>
-                            )}
-                        </div>
-                    )}
-                    {status.data?.status === 'used' && (
-                        <p role="status" className={styles.success}>
-                            {t('node.completed')}
-                        </p>
-                    )}
-                    {status.data?.status === 'unused' && (
-                        <p role="status" className={styles['micro-note']}>
-                            {t('node.expired')}
-                        </p>
-                    )}
                 </div>
             </section>
 

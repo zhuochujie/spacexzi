@@ -24,10 +24,10 @@ import { useWalletBalances } from "../../hooks/useWalletBalances"
 import FetchingOverlay from "../../components/fetching-overlay"
 import SkeletonText from "../../components/skeleton-text"
 import styles from "./index.module.css"
-import TopBG from './images/top_bg2.webp'
+import TopBG from './images/top_bg2.svg'
 import AddIcon from './images/add.svg'
 import CopyIcon from './images/copy.svg'
-import DetailsIcon from './images/details.svg'
+import OrdersIcon from './images/orders.svg'
 import LockIcon from './images/lock.svg'
 import SecurityIcon from './images/security.svg'
 import Modal from "../../components/modal"
@@ -313,10 +313,10 @@ function MarketPage() {
     const actionKey = tradeMode === 'buy' ? 'market.buy' : 'market.sell'
     const actionBalanceText = tradeMode === 'buy'
         ? `${formatAmount(walletBalances?.usdt ?? 0n, { display: true })} USDT`
-        : `${formatAmount(walletBalances?.space ?? 0n, { display: true })} SPACE`
+        : `${formatAmount(walletBalances?.space ?? 0n, { display: true })} SpaceXZI`
     const publishBalanceText = publishMode === 'buy'
         ? `${formatAmount(walletBalances?.usdt ?? 0n, { display: true })} USDT`
-        : `${formatAmount(walletBalances?.space ?? 0n, { display: true })} SPACE`
+        : `${formatAmount(walletBalances?.space ?? 0n, { display: true })} SpaceXZI`
     const selectedOrderAmount = selectedOrder ? formatTokenAmount(selectedOrder.remainingSpaceAmount) : '0'
     const selectedOrderPrice = selectedOrder ? formatAmount(selectedOrder.price, { display: true, fractionDigits: 3 }) : '0'
     const selectedOrderRemainingWei = selectedOrder ? BigInt(selectedOrder.remainingSpaceAmount) : 0n
@@ -571,7 +571,7 @@ function MarketPage() {
             <div className={styles.top}>
                 <div className={styles.text_con}>
                     <span>{t('nav.market')}</span>
-                    <span>{t('market.use')} <span className={styles.usdt}>USDT</span> {t('market.trade')} <span className={styles.space}>SPACE</span></span>
+                    <span>{t('market.use')} <span className={styles.usdt}>USDT</span> {t('market.trade')} <span className={styles.space}>SpaceXZI</span></span>
                     <div>
                         <div></div>
                         <div></div>
@@ -684,7 +684,7 @@ function MarketPage() {
                         {t('market.publishOrder')}
                     </button>
                     <button className={styles.my_order_btn} type="button" onClick={() => navigate('/market/orders')}>
-                        <img src={DetailsIcon} alt="" />
+                        <img src={OrdersIcon} alt="" />
                         {t('market.myOrders')}
                     </button>
                 </div>
@@ -734,7 +734,7 @@ function MarketPage() {
                                 {t('common.max')}
                             </button>
                         </div>
-                        {shouldShowAmountError && <small className={styles.input_error}>{t('common.min')} {formatAmount(marketConfig?.minOrderSpaceAmount ?? 0n, { display: true })} SPACE</small>}
+                        {shouldShowAmountError && <small className={styles.input_error}>{t('common.min')} {formatAmount(marketConfig?.minOrderSpaceAmount ?? 0n, { display: true })} SpaceXZI</small>}
                     </label>
                     <label>
                         <span className={styles.publish_label}>
@@ -761,7 +761,7 @@ function MarketPage() {
                         <div className={styles.fee_quota}>
                             <div className={styles.fee_quota_main}>
                                 <span>{t('market.feeExemptQuota')}</span>
-                                <strong>{feeExemptSpaceQuotaText} SPACE</strong>
+                                <strong>{feeExemptSpaceQuotaText} SpaceXZI</strong>
                             </div>
                             <em>{t('market.feeExemptQuotaHint')}</em>
                         </div>
@@ -834,7 +834,7 @@ function MarketPage() {
                     <div className={styles.order_dialog}>
                         <div>
                             <span>{t('market.tradableAmount')}</span>
-                            <strong>{selectedOrderAmount} SPACE</strong>
+                            <strong>{selectedOrderAmount} SpaceXZI</strong>
                         </div>
                         <div>
                             <span>{t('common.price')}</span>
@@ -865,7 +865,7 @@ function MarketPage() {
                             <div className={styles.fee_quota}>
                                 <div className={styles.fee_quota_main}>
                                     <span>{t('market.feeExemptQuota')}</span>
-                                    <strong>{feeExemptSpaceQuotaText} SPACE</strong>
+                                    <strong>{feeExemptSpaceQuotaText} SpaceXZI</strong>
                                 </div>
                                 <em>{t('market.feeExemptQuotaHint')}</em>
                             </div>

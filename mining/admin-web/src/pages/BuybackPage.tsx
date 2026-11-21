@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../lib/token'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -189,7 +190,7 @@ export default function BuybackPage() {
                 <>
                     <section className="summary-row">
                         <div className="summary-card">
-                            <span>SPACE 库存</span>
+                            <span>SpaceXZI 库存</span>
                             <strong>{display(data.availableSpace)}</strong>
                         </div>
                         <div className="summary-card">
@@ -205,8 +206,8 @@ export default function BuybackPage() {
                         <h2>固定价格</h2>
                         <p>
                             用户买入：{display(data.buyPrice)} USDT /
-                            SPACE；用户卖出：{display(data.sellPrice)} USDT /
-                            SPACE
+                            SpaceXZI；用户卖出：{display(data.sellPrice)} USDT /
+                            SpaceXZI
                         </p>
                         <p
                             className="muted"
@@ -263,7 +264,7 @@ export default function BuybackPage() {
                                 }
                             >
                                 <option>USDT</option>
-                                <option>SPACE</option>
+                                <option value="SPACE">SpaceXZI</option>
                             </select>
                         </div>
                         <div className="field">
@@ -290,10 +291,10 @@ export default function BuybackPage() {
                 <div className="field">
                     <label htmlFor="buyback-withdraw-asset">代币</label>
                     <select id="buyback-withdraw-asset" value={withdrawAsset} onChange={e => setWithdrawAsset(e.target.value as 'SPACE' | 'USDT')}>
-                        <option>USDT</option><option>SPACE</option>
+                        <option>USDT</option><option value="SPACE">SpaceXZI</option>
                     </select>
                 </div>
-                <p>池内可提取：{display(withdrawAsset === 'SPACE' ? data.availableSpace : data.availableUsdt)} {withdrawAsset}</p>
+                <p>池内可提取：{display(withdrawAsset === 'SPACE' ? data.availableSpace : data.availableUsdt)} {formatTokenSymbol(withdrawAsset)}</p>
                 <div className="field">
                     <label htmlFor="buyback-withdraw-recipient">接收地址</label>
                     <input id="buyback-withdraw-recipient" value={recipient} onChange={e => setRecipient(e.target.value)} placeholder="0x..." autoComplete="off" />
@@ -319,7 +320,7 @@ export default function BuybackPage() {
                             <tr>
                                 <th>名次</th>
                                 <th>地址</th>
-                                <th>累计 SPACE</th>
+                                <th>累计 SpaceXZI</th>
                                 <th>预计奖励 USDT</th>
                             </tr>
                         </thead>

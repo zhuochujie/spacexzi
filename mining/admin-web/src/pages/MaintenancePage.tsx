@@ -36,7 +36,7 @@ export function MaintenancePage() {
           </div>
         </div>
         <p className="muted">
-          开启后将禁止用户购买/复投矿机、提取免费矿机奖励、SPACE提现和USDT提现；市场操作和链上同步接口不受影响。
+          开启后将禁止用户购买/复投矿机、提取免费矿机奖励、SpaceXZI提现和USDT提现；市场操作和链上同步接口不受影响。
         </p>
         <div className="modal-actions">
           <button

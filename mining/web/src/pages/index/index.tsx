@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../utils/token'
 import { getMinerPresentation, freeMinerImage, fallbackMinerImage } from '../../utils/miner-presentation'
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -28,11 +29,11 @@ import MinerPaymentModal from "../../components/miner-payment-modal"
 import { useMinerPurchase } from "../../hooks/useMinerPurchase"
 import { getFriendlyErrorKey, useI18n } from "../../i18n"
 import styles from "./index.module.css"
-import Logo from '../../assets/images/logo.webp'
-import Arrow from './images/arrow.webp'
-import Safety from '../../assets/images/safety_bb.webp'
-import Transparent from '../../assets/images/transparent_bb.webp'
-import Efficient from '../../assets/images/efficient_bb.webp'
+import Logo from '../../assets/brand/spacexzi-logo-transparent.png'
+import Arrow from './images/arrow.svg'
+import Safety from '../../assets/images/safety_bb.svg'
+import Transparent from '../../assets/images/transparent_bb.svg'
+import Efficient from '../../assets/images/efficient_bb.svg'
 
 const NOTICE_SCROLL_SPEED_PX_PER_SECOND = 20
 const MIN_NOTICE_SCROLL_DURATION_SECONDS = 20
@@ -257,11 +258,10 @@ function IndexPage() {
     return (
         <div>
             <div className={styles.top}>
-                <img className={styles.logo} src={Logo} alt="Logo" />
+                <img className={styles.logo} src={Logo} alt="SpaceXZI" />
                 <div className={styles.text_con}>
-                    <span>{t('home.title')}</span>
-                    <span>{t('home.subtitle')}</span>
-                    <span>{t('home.desc')}</span>
+                    <h1 className={styles.hero_title}>{t('home.subtitle')}</h1>
+                    <p className={styles.hero_description}>{t('home.desc')}</p>
                 </div>
 
                 <div className={styles.notice_con}>
@@ -289,12 +289,12 @@ function IndexPage() {
             <div className={styles.activity}>
                 <button type="button" className={styles.card} onClick={handleClaimFeeExempt}>
                     <span>{claimingFeeExempt ? t('home.applying') : t('home.applyMarketMaker')}</span>
-                    <span>{t('home.becomeMarketMaker')}</span>
-                    <span>{t('home.earnMore')}</span>
+                    <span className={styles.card_description}>{t('home.becomeMarketMaker')}</span>
+                    <span>{t('home.applyMarketMakerAction')}</span>
                 </button>
                 <button type="button" className={styles.card} onClick={() => navigate('/node')}>
                     <span>{t('home.nodeTitle')}</span>
-                    <span>{t('home.nodeDescription')}</span>
+                    <span className={styles.card_description}>{t('home.nodeDescription')}</span>
                     <span>{t('home.nodeAction')}</span>
                 </button>
             </div>
@@ -341,7 +341,7 @@ function IndexPage() {
                                             <div className={styles.data}>
                                                 <div>
                                                     <span>{t('home.output')}</span>
-                                                    <span>{freeMinerAmountQuery.data !== undefined ? formatAmount(freeMinerAmountQuery.data, { display: true }) : '—'} SPACE</span>
+                                                    <span>{freeMinerAmountQuery.data !== undefined ? formatAmount(freeMinerAmountQuery.data, { display: true }) : '—'} SpaceXZI</span>
                                                 </div>
                                                 <div>
                                                     <span>{t('home.cycle')}</span>
@@ -351,8 +351,8 @@ function IndexPage() {
                                         </div>
                                         <div className={styles.right}>
                                             <span className={styles.free_price}>
-                                                <s>{freeMinerConfigQuery.data ? formatAmount(freeMinerConfigQuery.data.price, { display: true }) : '—'} <span>SPACE</span></s>
-                                                <span>0 <span>SPACE</span></span>
+                                                <s>{freeMinerConfigQuery.data ? formatAmount(freeMinerConfigQuery.data.price, { display: true }) : '—'} <span>SpaceXZI</span></s>
+                                                <span>0 <span>SpaceXZI</span></span>
                                             </span>
                                             <button
                                                 className={styles.buy}
@@ -370,7 +370,7 @@ function IndexPage() {
                                     <div className={styles.miner} key={miner.id}>
                                         <img
                                             src={getMinerPresentation(miner.id, miner.desc).image}
-                                            alt={miner.name}
+                                            alt={formatTokenSymbol(miner.name)}
                                             onError={(event) => {
                                                 if (!event.currentTarget.src.endsWith(fallbackMinerImage)) {
                                                     event.currentTarget.src = fallbackMinerImage
@@ -378,12 +378,12 @@ function IndexPage() {
                                             }}
                                         />
                                         <div className={styles.info}>
-                                            <span>{miner.name}</span>
+                                            <span>{formatTokenSymbol(miner.name)}</span>
                                             <span>{t(getMinerPresentation(miner.id, miner.desc).description)}</span>
                                             <div className={styles.data}>
                                                 <div>
                                                     <span>{t('home.output')}</span>
-                                                    <span>{formatAmount(miner.expectedReward, { display: true })} SPACE</span>
+                                                    <span>{formatAmount(miner.expectedReward, { display: true })} SpaceXZI</span>
                                                 </div>
                                                 <div>
                                                     <span>{t('home.cycle')}</span>
@@ -396,7 +396,7 @@ function IndexPage() {
                                             </div>
                                         </div>
                                         <div className={styles.right}>
-                                            <span>{formatAmount(miner.price, { display: true, fractionDigits: 3 })} <span>SPACE</span></span>
+                                            <span>{formatAmount(miner.price, { display: true, fractionDigits: 3 })} <span>SpaceXZI</span></span>
                                             <button
                                                 className={styles.buy}
                                                 disabled={miner.isOwned || !miner.isPurchasable || Boolean(buyingMinerId)}

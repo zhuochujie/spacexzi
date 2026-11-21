@@ -28,7 +28,7 @@
 }
 
 .text_con > span:nth-child(2) > .space {
-    color: #8d50ff;
+    color: #50A6FF;
 }
 
 .text_con > span:nth-child(4) {
@@ -51,17 +51,17 @@
 
 .text_con > div > div:nth-child(1) {
     width: 30px;
-    background: #8d50ff;
+    background: #50A6FF;
 }
 
 .text_con > div > div:nth-child(2) {
     width: 10px;
-    background: #251c73;
+    background: #1C4773;
 }
 
 .text_con > div > div:nth-child(3) {
     width: 2px;
-    background: #8d50ff;
+    background: #50A6FF;
 }
 
 .top > img {
@@ -141,13 +141,13 @@
 }
 
 .trade_tabs > .trade_tab_active {
-    background: linear-gradient(135deg, #6536E7 0%, #006EFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #006EFF 100%);
 }
 
 .order_header,
 .order_item {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) 0.8fr 0.9fr 54px;
+    grid-template-columns: minmax(0, 1fr) minmax(94px, 1.2fr) minmax(70px, 0.9fr) 54px;
     align-items: center;
     column-gap: 6px;
 }
@@ -156,13 +156,15 @@
     color: #7F8BA8;
     font-size: 10px;
     margin-bottom: 8px;
-    padding: 0 6px;
+    padding: 0 8px;
+    border: 1px solid transparent;
 }
+.order_header > span { white-space: nowrap; }
 
 .order_item {
     min-height: 40px;
     margin-bottom: 7px;
-    padding: 0 7px;
+    padding: 0 8px;
     border-radius: 7px;
     background: rgba(5, 28, 53, 0.88);
     color: #F1F2F4;
@@ -254,7 +256,7 @@
     font-weight: 600;
     border: none;
     border-radius: 6px;
-    background: linear-gradient(135deg, #6536E7 0%, #007CFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #007CFF 100%);
 }
 
 .pagination {
@@ -357,7 +359,7 @@
 .publish_btn {
     color: #FFF;
     border: none;
-    background: linear-gradient(135deg, #6536E7 0%, #007CFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #007CFF 100%);
 }
 
 .my_order_btn {
@@ -374,10 +376,10 @@
     margin-top: 12px;
     padding: 0 14px;
     color: #FFF;
-    border: 1px solid rgba(141, 80, 255, 0.58);
+    border: 1px solid rgba(35, 153, 255, 0.58);
     border-radius: 8px;
-    background: rgba(38, 21, 84, 0.32);
-    box-shadow: inset 0 0 18px rgba(141, 80, 255, 0.08);
+    background: rgba(35, 153, 255, 0.32);
+    box-shadow: inset 0 0 18px rgba(35, 153, 255, 0.08);
 }
 
 .lock_icon {
@@ -410,7 +412,7 @@
 }
 
 .private_arrow {
-    color: #8D50FF;
+    color: #50A6FF;
     font-size: 28px;
     line-height: 1;
 }
@@ -475,7 +477,7 @@
 
 .publish_mode > .publish_mode_active {
     color: #FFF;
-    background: linear-gradient(135deg, #6536E7 0%, #006EFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #006EFF 100%);
 }
 
 .publish_input {
@@ -714,3 +716,16 @@
     font-size: 12px;
     font-weight: 600;
 }
+
+/* Technology blue visual system */
+
+.top { margin: 16px; padding: 20px; border: 1px solid #214c73; border-radius: 20px; background: linear-gradient(130deg,#102d4c,#081b30); align-items: center; }
+.text_con > span:nth-child(1) { margin-top: 0; font-size: 25px; }
+.text_con > span:nth-child(2) > .space { color: #68d8ff; }
+.top > img { width: 100px; height: 110px; object-fit: contain; }
+.market_stats { border-radius: 16px; background: #0b2139; border: 1px solid #204766; }
+.trade_panel { border-radius: 18px; background: #0b2139; border: 1px solid #204766; }
+.trade_tabs { background: #061a2d; border-radius: 12px; padding: 5px; }
+.trade_tabs > .trade_tab_active { background: #176dc4; color: #fff; border-radius: 9px; }
+.order_item { border: 1px solid #204766; border-radius: 14px; background: #091d33; }
+.buy_btn { background: #217de6; border-radius: 9px; }

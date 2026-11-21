@@ -58,9 +58,17 @@
 
 .confirm {
     color: #FFF;
-    background: linear-gradient(to bottom right, #45B2E9, #6536E7);
+    background: linear-gradient(to bottom right, #45B2E9, #368DE7);
 }
 
 .actions button:disabled {
     opacity: 0.55;
 }
+
+/* Technology blue visual system */
+
+.modal { padding: 24px 20px 20px; border-radius: 20px; background: #0b2139; border-color: #2b5e85; }
+.title { text-align: left; font-size: 18px; }
+.actions button { height: 42px; border-radius: 10px; }
+.cancel { color: #adcbe5; background: #123451; }
+.confirm { background: #237fe9; }

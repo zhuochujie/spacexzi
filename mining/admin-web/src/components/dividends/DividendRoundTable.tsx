@@ -40,11 +40,11 @@ export function DividendRoundTable({
             <thead>
               <tr>
                 <th>分红时间</th>
-                <th>VIP SPACE</th>
-                <th>节点 SPACE</th>
+                <th>VIP SpaceXZI</th>
+                <th>节点 SpaceXZI</th>
                 <th>节点 USDT</th>
                 <th>回购 USDT</th>
-                <th>SPACE 总数</th>
+                <th>SpaceXZI 总数</th>
                 <th>USDT 总数</th>
                 <th>Fallback</th>
                 <th>统计条数</th>

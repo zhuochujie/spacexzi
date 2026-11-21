@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import type { DividendRuleGroup } from '../../api'
 import { LoadingOverlay } from '../common/LoadingOverlay'
 import { formatDividendBp, formatDividendCategory } from '../../lib/dividends'
@@ -39,9 +40,9 @@ export function DividendRuleTable({ groups, busy, onEdit }: DividendRuleTablePro
                 const latestUpdatedAt = Math.max(...group.rules.map((rule) => rule.updatedAt || rule.createdAt))
 
                 return (
-                <tr key={`${group.category}-${group.token}`}>
+                <tr key={`${group.category}-${formatTokenSymbol(group.token)}`}>
                   <td>{formatDividendCategory(group.category)}</td>
-                  <td>{group.token}</td>
+                  <td>{formatTokenSymbol(group.token)}</td>
                   <td>{group.totalBp}</td>
                   <td>{formatDividendBp(group.totalBp)}</td>
                   <td className="cell-clip">

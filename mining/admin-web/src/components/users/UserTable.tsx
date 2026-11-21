@@ -92,7 +92,7 @@ export function UserTable({
                 onSortChange={onSortChange}
               />
               <th>做市白名单</th>
-              <SortableTh field="balance" label="SPACE" sortBy={sortBy} sortOrder={sortOrder} onSortChange={onSortChange} />
+              <SortableTh field="balance" label="SpaceXZI" sortBy={sortBy} sortOrder={sortOrder} onSortChange={onSortChange} />
               <SortableTh field="usdtBalance" label="USDT" sortBy={sortBy} sortOrder={sortOrder} onSortChange={onSortChange} />
               <SortableTh field="teamCount" label="团队人数" sortBy={sortBy} sortOrder={sortOrder} onSortChange={onSortChange} />
               <SortableTh
@@ -239,7 +239,7 @@ function formatSortName(sortBy: string) {
   const names: Record<string, string> = {
     id: '用户ID',
     createdAt: '创建时间',
-    balance: 'SPACE',
+    balance: 'SpaceXZI',
     usdtBalance: 'USDT',
     vipLevel: 'VIP等级',
     manualVipLevel: '指定VIP等级',

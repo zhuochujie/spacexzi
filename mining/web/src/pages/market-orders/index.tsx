@@ -222,11 +222,11 @@ function MarketOrdersPage() {
                         <div className={styles.order_grid}>
                             <div>
                                 <span>{t('marketOrders.remainingAmount')}</span>
-                                <strong>{formatTokenAmount(order.remainingSpaceAmount)} SPACE</strong>
+                                <strong>{formatTokenAmount(order.remainingSpaceAmount)} SpaceXZI</strong>
                             </div>
                             <div>
                                 <span>{t('marketOrders.orderAmount')}</span>
-                                <strong>{formatTokenAmount(order.spaceAmount)} SPACE</strong>
+                                <strong>{formatTokenAmount(order.spaceAmount)} SpaceXZI</strong>
                             </div>
                             <div>
                                 <span>{t('common.price')}</span>
@@ -254,7 +254,7 @@ function MarketOrdersPage() {
                         <div className={styles.order_grid}>
                             <div>
                                 <span>{t('marketOrders.tradeAmount')}</span>
-                                <strong>{formatTokenAmount(trade.spaceAmount)} SPACE</strong>
+                                <strong>{formatTokenAmount(trade.spaceAmount)} SpaceXZI</strong>
                             </div>
                             <div>
                                 <span>{t('marketOrders.tradePrice')}</span>

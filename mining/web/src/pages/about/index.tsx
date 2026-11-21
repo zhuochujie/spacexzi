@@ -1,11 +1,11 @@
 import PageHeader from "../../components/page-header"
 import { useI18n } from "../../i18n"
 import styles from "./index.module.css"
-import LogoImage from "../../assets/images/logo.webp"
-import HeroImage from "../../assets/images/bg.webp"
-import SafetyImage from "../../assets/images/safety_bb.webp"
-import EfficientImage from "../../assets/images/efficient_bb.webp"
-import TransparentImage from "../../assets/images/transparent_bb.webp"
+import LogoImage from "../../assets/brand/spacexzi-logo-transparent.png"
+import HeroImage from "../../assets/images/bg.svg"
+import SafetyImage from "../../assets/images/safety_bb.svg"
+import EfficientImage from "../../assets/images/efficient_bb.svg"
+import TransparentImage from "../../assets/images/transparent_bb.svg"
 
 const features = [
     {
@@ -35,7 +35,7 @@ function AboutPage() {
             <section className={styles.hero}>
                 <img className={styles.hero_bg} src={HeroImage} alt="" />
                 <div className={styles.hero_content}>
-                    <img className={styles.logo} src={LogoImage} alt="SPACE" />
+                    <img className={styles.logo} src={LogoImage} alt="SpaceXZI" />
                     <p>{t('about.heroDesc')}</p>
                 </div>
             </section>

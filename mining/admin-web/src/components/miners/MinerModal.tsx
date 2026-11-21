@@ -126,7 +126,7 @@ export function MinerModal({
                 id="miner-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="SPACE 100"
+                placeholder="SpaceXZI 100"
               />
             </div>
             <div className="field compact field-editable">

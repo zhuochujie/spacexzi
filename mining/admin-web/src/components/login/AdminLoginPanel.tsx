@@ -36,7 +36,7 @@ export function AdminLoginPanel({ onLogin }: AdminLoginPanelProps) {
   return (
     <section className="auth-panel">
       <div className="auth-copy">
-        <p className="eyebrow">Admin Console</p>
+        <p className="eyebrow">SpaceXZI Admin</p>
         <h1>管理后台</h1>
         <p className="muted">使用后台账号登录。</p>
 

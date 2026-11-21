@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import IndexImage from './images/index.webp'
-import IndexImageActive from './images/index-active.webp'
-import MinerImage from './images/miner.webp'
-import MinerImageActive from './images/miner-active.webp'
-import MarketImage from './images/market.webp'
-import MarketImageActive from './images/market-active.webp'
-import PersonalImage from './images/personal.webp'
-import PersonalImageActive from './images/personal-active.webp'
+import IndexImage from './images/index.svg'
+import IndexImageActive from './images/index-active.svg'
+import MinerImage from './images/miner.svg'
+import MinerImageActive from './images/miner-active.svg'
+import MarketImage from './images/market.svg'
+import MarketImageActive from './images/market-active.svg'
+import PersonalImage from './images/personal.svg'
+import PersonalImageActive from './images/personal-active.svg'
 import BuybackImage from './images/buyback.svg'
 import BuybackImageActive from './images/buyback-active.svg'
 import { useI18n } from "../../i18n";
@@ -71,10 +71,10 @@ function BottomMenu() {
                     const isActive = pathname === item.path;
 
                     return (
-                        <div key={item.path} onClick={() => navigate(item.path)}>
-                            <img src={isActive ? item.activeIcon : item.icon} alt={item.label} />
+                        <button type="button" key={item.path} aria-current={isActive ? 'page' : undefined} onClick={() => navigate(item.path)}>
+                            <img src={isActive ? item.activeIcon : item.icon} alt="" />
                             <span className={isActive ? styles.menu_active : ''}>{t(item.label)}</span>
-                        </div>
+                        </button>
                     )
                 })}
             </div>

@@ -163,7 +163,7 @@ export function UserTeamModal({
           <SummaryCard label="购买矿机人数" value={overview?.teamMinerBuyerCount ?? 0} />
           <SummaryCard label="普通矿机数" value={overview?.teamMinerCount ?? 0} />
           <SummaryCard label="免费矿机数" value={overview?.teamFreeMinerCount ?? 0} />
-          <SummaryCard label="团队奖励" value={`${formatAmount(overview?.teamReward ?? '0', { display: true })} SPACE`} />
+          <SummaryCard label="团队奖励" value={`${formatAmount(overview?.teamReward ?? '0', { display: true })} SpaceXZI`} />
         </section>
 
         <section className="detail-section team-chain-section">
@@ -248,7 +248,7 @@ export function UserTeamModal({
             <LoadingOverlay loading={minerPurchaseStatsBusy} />
             <SummaryCard
               label="总矿机价值"
-              value={`${formatAmount(minerPurchaseStats?.totalMinerPrice ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(minerPurchaseStats?.totalMinerPrice ?? '0', { display: true })} SpaceXZI`}
             />
 
 
@@ -298,27 +298,27 @@ export function UserTeamModal({
             <LoadingOverlay loading={marketStatsBusy} />
             <SummaryCard
               label="总卖出"
-              value={`${formatAmount(marketStats?.totalSellSpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.totalSellSpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
             <SummaryCard
               label="主动卖出"
-              value={`${formatAmount(marketStats?.activeSellSpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.activeSellSpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
             <SummaryCard
               label="被动卖出"
-              value={`${formatAmount(marketStats?.passiveSellSpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.passiveSellSpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
             <SummaryCard
               label="总买入"
-              value={`${formatAmount(marketStats?.totalBuySpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.totalBuySpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
             <SummaryCard
               label="主动买入"
-              value={`${formatAmount(marketStats?.activeBuySpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.activeBuySpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
             <SummaryCard
               label="被动买入"
-              value={`${formatAmount(marketStats?.passiveBuySpaceAmount ?? '0', { display: true })} SPACE`}
+              value={`${formatAmount(marketStats?.passiveBuySpaceAmount ?? '0', { display: true })} SpaceXZI`}
             />
           </div>
         </section>

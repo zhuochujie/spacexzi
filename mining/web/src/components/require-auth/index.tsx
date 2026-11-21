@@ -1,21 +1,14 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router'
-import { getAccessToken } from '../../api'
+import { useAuthSession } from '../../hooks/useAuthSession'
 
-type RequireAuthProps = {
-    children: ReactNode
-}
-
-function RequireAuth({ children }: RequireAuthProps) {
+function RequireAuth({ children }: { children: ReactNode }) {
+    const accessToken = useAuthSession()
     const location = useLocation()
-    const token = getAccessToken()
-
-    if (!token) {
-        const redirect = `${location.pathname}${location.search}`
-
-        return <Navigate to={`/?redirect=${encodeURIComponent(redirect)}`} replace />
+    if (!accessToken) {
+        const redirect = location.pathname + location.search
+        return <Navigate to={`/login?redirect=${encodeURIComponent(redirect)}`} replace />
     }
-
     return children
 }
 

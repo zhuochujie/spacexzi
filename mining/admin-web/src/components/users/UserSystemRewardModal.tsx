@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import { useState, type FormEvent } from 'react'
 import { parseUnits } from 'viem'
 import type { UserRecord } from '../../api'
@@ -36,7 +37,7 @@ export function UserSystemRewardModal({
     try {
       amountWei = parseUnits(amount.trim(), 18)
     } catch {
-      setLocalError(`请输入有效的 ${token} 数量。`)
+      setLocalError(`请输入有效的 ${formatTokenSymbol(token)} 数量。`)
       return
     }
 
@@ -83,15 +84,15 @@ export function UserSystemRewardModal({
                 disabled={busy}
               >
                 <option value="USDT">USDT</option>
-                <option value="SPACE">SPACE</option>
+                <option value="SPACE">SpaceXZI</option>
               </select>
             </div>
             <div className="field compact">
-              <label>当前{token}余额</label>
-              <strong>{formatAmount(currentBalance, { display: true })} {token}</strong>
+              <label>当前{formatTokenSymbol(token)}余额</label>
+              <strong>{formatAmount(currentBalance, { display: true })} {formatTokenSymbol(token)}</strong>
             </div>
             <div className="field compact field-editable">
-              <label htmlFor="system-reward-amount">奖励数量（{token}）</label>
+              <label htmlFor="system-reward-amount">奖励数量（{formatTokenSymbol(token)}）</label>
               <input
                 id="system-reward-amount"
                 inputMode="decimal"

@@ -48,7 +48,7 @@ export function AdminLayout({ token, onLogout }: AdminLayoutProps) {
 
       <aside id="admin-sidebar" className={navOpen ? 'sidebar open' : 'sidebar'}>
         <div className="sidebar-brand">
-          <p className="eyebrow">Admin Console</p>
+          <p className="eyebrow">SpaceXZI Admin</p>
           <strong>管理后台</strong>
         </div>
         <nav className="sidebar-nav" aria-label="后台导航">

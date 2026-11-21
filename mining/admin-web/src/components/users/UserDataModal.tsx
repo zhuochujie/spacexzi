@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import { useEffect, useRef, useState } from 'react'
 import { parseUnits } from 'viem'
 import copy from 'copy-to-clipboard'
@@ -136,7 +137,7 @@ export function UserDataModal({
     try {
       amountWei = parseUnits(accelerateAmount.trim(), 18)
     } catch {
-      setAccelerateFormError('请输入有效的 SPACE 数量。')
+      setAccelerateFormError("请输入有效的 SpaceXZI 数量。")
       return
     }
 
@@ -227,7 +228,7 @@ export function UserDataModal({
                   onChange={(event) => onFiltersChange({ ...filters, token: event.target.value, page: 1 })}
                 >
                   <option value="">全部</option>
-                  <option value="SPACE">SPACE</option>
+                  <option value="SPACE">SpaceXZI</option>
                   <option value="USDT">USDT</option>
                 </select>
               </div>
@@ -312,12 +313,12 @@ export function UserDataModal({
               )}
               <div className={marketTradeStatsBusy ? 'summary-row loading-scope is-loading' : 'summary-row loading-scope'}>
                 <LoadingOverlay loading={marketTradeStatsBusy} />
-                <SummaryCard label="总买入" value={`${formatAmount(marketTradeStats?.totalBuySpaceAmount ?? '0', { display: true })} SPACE`} />
-                <SummaryCard label="主动买入" value={`${formatAmount(marketTradeStats?.activeBuySpaceAmount ?? '0', { display: true })} SPACE`} />
-                <SummaryCard label="被动买入" value={`${formatAmount(marketTradeStats?.passiveBuySpaceAmount ?? '0', { display: true })} SPACE`} />
-                <SummaryCard label="总卖出" value={`${formatAmount(marketTradeStats?.totalSellSpaceAmount ?? '0', { display: true })} SPACE`} />
-                <SummaryCard label="主动卖出" value={`${formatAmount(marketTradeStats?.activeSellSpaceAmount ?? '0', { display: true })} SPACE`} />
-                <SummaryCard label="被动卖出" value={`${formatAmount(marketTradeStats?.passiveSellSpaceAmount ?? '0', { display: true })} SPACE`} />
+                <SummaryCard label="总买入" value={`${formatAmount(marketTradeStats?.totalBuySpaceAmount ?? '0', { display: true })} SpaceXZI`} />
+                <SummaryCard label="主动买入" value={`${formatAmount(marketTradeStats?.activeBuySpaceAmount ?? '0', { display: true })} SpaceXZI`} />
+                <SummaryCard label="被动买入" value={`${formatAmount(marketTradeStats?.passiveBuySpaceAmount ?? '0', { display: true })} SpaceXZI`} />
+                <SummaryCard label="总卖出" value={`${formatAmount(marketTradeStats?.totalSellSpaceAmount ?? '0', { display: true })} SpaceXZI`} />
+                <SummaryCard label="主动卖出" value={`${formatAmount(marketTradeStats?.activeSellSpaceAmount ?? '0', { display: true })} SpaceXZI`} />
+                <SummaryCard label="被动卖出" value={`${formatAmount(marketTradeStats?.passiveSellSpaceAmount ?? '0', { display: true })} SpaceXZI`} />
               </div>
             </div>
             <div className="detail-filters">
@@ -421,12 +422,12 @@ export function UserDataModal({
             </header>
             <section className="detail-section">
               <div className="field">
-                <label htmlFor="accelerate-amount">释放数量（SPACE）</label>
+                <label htmlFor="accelerate-amount">释放数量（SpaceXZI）</label>
                 <input
                   id="accelerate-amount"
                   value={accelerateAmount}
                   disabled={accelerateBusy}
-                  placeholder="请输入要释放的 SPACE 数量"
+                  placeholder="请输入要释放的 SpaceXZI 数量"
                   onChange={(event) => {
                     setAccelerateAmount(event.target.value)
                     setAccelerateFormError('')
@@ -434,11 +435,11 @@ export function UserDataModal({
                 />
               </div>
             <p className="status">
-              剩余可释放：{formatAmount(accelerateRemainingReward, { fractionDigits: 5, fixed: true })} SPACE
+              剩余可释放：{formatAmount(accelerateRemainingReward, { fractionDigits: 5, fixed: true })} SpaceXZI
             </p>
             {shouldShowAccelerateCapHint && (
               <p className="status warning">
-                输入数量超过剩余可释放额度，实际将释放 {formatAmount(accelerateRemainingReward, { fractionDigits: 5, fixed: true })} SPACE。
+                输入数量超过剩余可释放额度，实际将释放 {formatAmount(accelerateRemainingReward, { fractionDigits: 5, fixed: true })} SpaceXZI。
               </p>
             )}
             {(accelerateFormError || accelerateError) && (
@@ -589,7 +590,7 @@ function BalanceLogTable({
             <tr key={item.id}>
               <td>{item.id}</td>
               <td>{formatBalanceLogType(item.type)}</td>
-              <td>{item.token}</td>
+              <td>{formatTokenSymbol(item.token)}</td>
               <td>{formatAmount(item.amount, { display: true })}</td>
               <td>{formatAmount(item.balanceBefore, { display: true })}</td>
               <td>{formatAmount(item.balanceAfter, { display: true })}</td>

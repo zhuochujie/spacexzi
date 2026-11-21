@@ -1,31 +1,27 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from 'react-router'
+import { AUTH_CHANGED_EVENT, getAccessToken } from '../../api'
 
 function AuthExpiredHandler() {
-    const navigate = useNavigate()
-    const location = useLocation()
     const queryClient = useQueryClient()
-
     useEffect(() => {
-        const handleAuthExpired = () => {
-            const redirect = `${location.pathname}${location.search}`
-
-            if (location.pathname === '/' || location.pathname === '/login') {
-                return
+        let previousToken = getAccessToken()
+        const handleSessionChange = (event: Event) => {
+            const nextToken = getAccessToken()
+            if (nextToken !== previousToken || event.type === 'auth:expired') {
+                previousToken = nextToken
+                queryClient.clear()
             }
-
-            queryClient.clear()
-            navigate(`/?redirect=${encodeURIComponent(redirect)}`, { replace: true })
         }
-
-        window.addEventListener('auth:expired', handleAuthExpired)
-
+        window.addEventListener(AUTH_CHANGED_EVENT, handleSessionChange)
+        window.addEventListener('auth:expired', handleSessionChange)
+        window.addEventListener('storage', handleSessionChange)
         return () => {
-            window.removeEventListener('auth:expired', handleAuthExpired)
+            window.removeEventListener(AUTH_CHANGED_EVENT, handleSessionChange)
+            window.removeEventListener('auth:expired', handleSessionChange)
+            window.removeEventListener('storage', handleSessionChange)
         }
-    }, [location.pathname, location.search, navigate, queryClient])
-
+    }, [queryClient])
     return null
 }
 

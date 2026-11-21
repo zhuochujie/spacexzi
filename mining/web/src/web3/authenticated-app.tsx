@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { WagmiProvider } from 'wagmi'
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import BottomMenu from '../components/bottom-menu'
 import RequireAuth from '../components/require-auth'
 import WalletAuthGuard from '../components/wallet-auth-guard'
@@ -40,6 +40,7 @@ function AuthenticatedApp() {
         <Route path="/personal/about" element={<RequireAuth><AboutPage /></RequireAuth>} />
         <Route path="/notice" element={<NoticePage />} />
         <Route path="/notice/:id" element={<NoticeDetailPage />} />
+        <Route path="*" element={<Navigate to="/index" replace />} />
       </Routes>
       <BottomMenu />
     </WagmiProvider>

@@ -299,8 +299,11 @@ export function getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY)
 }
 
+export const AUTH_CHANGED_EVENT = 'auth:changed'
+
 export function setAccessToken(token: string) {
     localStorage.setItem(ACCESS_TOKEN_KEY, token)
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
 }
 
 export function getLoginAddress() {
@@ -309,11 +312,13 @@ export function getLoginAddress() {
 
 export function setLoginAddress(address: string) {
     localStorage.setItem(LOGIN_ADDRESS_KEY, address.toLowerCase())
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
 }
 
 export function clearAccessToken() {
     localStorage.removeItem(ACCESS_TOKEN_KEY)
     localStorage.removeItem(LOGIN_ADDRESS_KEY)
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
 }
 
 function notifyAuthExpired() {

@@ -27,7 +27,7 @@ export function OverviewPage() {
 
       <section className="summary-row overview-stats" aria-busy={statsQuery.isFetching}>
         <div className="summary-card overview-card">
-          <span>今日 SPACE 购买矿机总额</span>
+          <span>今日 SpaceXZI 购买矿机总额</span>
           <strong>{stats ? formatAmount(stats.todayMinerPurchaseSpace.amount, { display: true }) : '-'}</strong>
           <small>
             {stats
@@ -52,7 +52,7 @@ export function OverviewPage() {
               ? `${formatAmount(stats.userBalanceTotals.spaceBalance, { display: true })} / ${formatAmount(stats.userBalanceTotals.usdtBalance, { display: true, fractionDigits: 3 })}`
               : '-'}
           </strong>
-          <small>用户普通余额 + 用户回购余额 + 回购池余额（SPACE / USDT）</small>
+          <small>用户普通余额 + 用户回购余额 + 回购池余额（SpaceXZI / USDT）</small>
         </div>
         <div className="summary-card overview-card">
           <span>今晚预估付费矿机奖励(静态)</span>
@@ -69,7 +69,7 @@ export function OverviewPage() {
           <small>{stats ? `${stats.estimatedMinerRewards.freeMiner.minerCount} 台待领取；用户领取后入账，不参与凌晨发放` : '-'}</small>
         </div>
         <div className="summary-card overview-card">
-          <span>当前挂单 SPACE 数量</span>
+          <span>当前挂单 SpaceXZI 数量</span>
           <strong>
             {stats
               ? `${formatAmount(stats.marketOpenSpace.buySpaceAmount, { display: true })} / ${formatAmount(stats.marketOpenSpace.sellSpaceAmount, { display: true })}`
@@ -87,7 +87,7 @@ export function OverviewPage() {
           <small>
             {stats
               ? `成交 ${stats.todayMarketTrades.tradeCount} 笔，${formatTime(stats.todayMarketTrades.from)} 至 ${formatTime(stats.todayMarketTrades.to)}`
-              : 'SPACE 成交量 / 交易额'}
+              : "SpaceXZI 成交量 / 交易额"}
           </small>
         </div>
       </section>

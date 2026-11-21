@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import { useState, type FormEvent } from 'react'
 import type { DividendRuleGroup, DividendRuleGroupPayload } from '../../api'
 import { formatDividendBp, formatDividendCategory } from '../../lib/dividends'
@@ -100,7 +101,7 @@ export function DividendRuleModal({
             </div>
             <div className="field compact">
               <label>Token</label>
-              <div className="readonly-value">{group.token}</div>
+              <div className="readonly-value">{formatTokenSymbol(group.token)}</div>
             </div>
             <div className="field compact">
               <label>当前总 BP</label>

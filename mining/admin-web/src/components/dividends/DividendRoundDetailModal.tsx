@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import type { DividendLevelStat, DividendRoundSummary } from '../../api'
 import { LoadingOverlay } from '../common/LoadingOverlay'
 import { formatDividendBp, formatDividendCategory } from '../../lib/dividends'
@@ -43,11 +44,11 @@ export function DividendRoundDetailModal({
 
         <section className="summary-row">
           <div className="summary-card">
-            <span>VIP SPACE</span>
+            <span>VIP SpaceXZI</span>
             <strong>{formatAmount(round.vipSpaceAmount, { display: true })}</strong>
           </div>
           <div className="summary-card">
-            <span>节点 SPACE</span>
+            <span>节点 SpaceXZI</span>
             <strong>{formatAmount(round.nodeSpaceAmount, { display: true })}</strong>
           </div>
           <div className="summary-card">
@@ -78,7 +79,7 @@ export function DividendRoundDetailModal({
               {stats.map((stat) => (
                 <tr key={stat.id}>
                   <td>{formatDividendCategory(stat.category)}</td>
-                  <td>{stat.token}</td>
+                  <td>{formatTokenSymbol(stat.token)}</td>
                   <td>{formatLevel(stat)}</td>
                   <td>{formatDividendBp(stat.bp)}</td>
                   <td>{stat.recipientCount}</td>

@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../utils/token'
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { getBalanceLogs, type BalanceLogType } from "../../api"
@@ -92,7 +93,7 @@ function MinerRewardsPage() {
                             </div>
                             <div className={styles.amount}>
                                 <strong>{formatAmount(log.amount, { signed: true, display: true })}</strong>
-                                <em>{log.token}</em>
+                                <em>{formatTokenSymbol(log.token)}</em>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-# SPACE 项目部署
+# SpaceXZI 项目部署
 
 部署入口：Foundry 原生 Solidity 脚本 `script/Deploy.s.sol:DeployScript`，直接使用 `forge script` 执行。
 
@@ -25,6 +25,14 @@
 脚本会配置 SPACE 白名单，从 10 亿 SpaceXZI 中分配配置的初始回购库存，剩余转入主金库，并授权 Mining 调用金库资金，并授权回购池更新 TokenExchange 的免手续费额度。SPACE 转账的市场费用进入 MARKET_FEE_RECEIVER_ADDRESS，节点费用进入节点分红金库。回购买卖默认开启，可用 BUYBACK_PAUSED 配置暂停；节点购买可用 NODE_PURCHASE_PAUSED 配置暂停状态。
 
 ## 使用 Foundry 执行
+
+USDT 地址变化时，在 `mining/core` 目录执行：
+
+```bash
+python3 scripts/set-usdt-address.py <USDT合约地址>
+```
+
+脚本同步 core、server 的 `USDT_TOKEN_ADDRESS` 和 web 的 `VITE_USDT_TOKEN_ADDRESS`，更新已有的 `.env` 与 `.env.example`，缺失文件不创建，其他配置及注释保留。加 `--dry-run` 可只预览文件列表。它只修改环境配置，不修改已部署合约绑定的 USDT；完整部署结果仍使用下文的导出脚本同步。
 
 所有命令均在 `mining/core` 目录执行。先复制 `.env.example` 为 `.env` 并填写参数。Foundry 会加载项目 `.env`；脚本通过 `vm.envUint` / `vm.envAddress` / `vm.envOr` 读取配置。
 

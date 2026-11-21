@@ -63,7 +63,7 @@ export function DividendsPage() {
         </div>
       </section>
 
-      <p className="muted">节点 SPACE / USDT 分红按等级价格占全部参与者节点总价值的比例计算，无逐等级比例配置。</p>
+      <p className="muted">节点 SpaceXZI / USDT 分红按等级价格占全部参与者节点总价值的比例计算，无逐等级比例配置。</p>
 
       <DividendRuleTable
         groups={ruleGroups}

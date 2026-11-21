@@ -1,39 +1,33 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from 'react-router'
 import { useConnection } from 'wagmi'
-import { clearAccessToken, getAccessToken, getLoginAddress } from '../../api'
+import { clearAccessToken, getLoginAddress } from '../../api'
+import { useAuthSession } from '../../hooks/useAuthSession'
 import { appChainId, ensureAppChain } from '../../web3/config'
 
 function WalletAuthGuard() {
-    const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const location = useLocation()
-    const { address, chainId, connector, isConnected } = useConnection()
+    const token = useAuthSession()
+    const { address, chainId, connector, isConnected, status } = useConnection()
 
     useEffect(() => {
-        const token = getAccessToken()
         const loginAddress = getLoginAddress()
 
-        if (!token || location.pathname === '/' || location.pathname === '/login') {
+        if (!token || status === 'reconnecting' || status === 'connecting') {
             return
         }
-
-        const redirect = `${location.pathname}${location.search}`
 
         if (!isConnected || !address) {
             clearAccessToken()
             queryClient.clear()
-            navigate(`/?redirect=${encodeURIComponent(redirect)}`, { replace: true })
             return
         }
 
         if (loginAddress && address.toLowerCase() !== loginAddress) {
             clearAccessToken()
             queryClient.clear()
-            navigate(`/?redirect=${encodeURIComponent(redirect)}`, { replace: true })
         }
-    }, [address, isConnected, location.pathname, location.search, navigate, queryClient])
+    }, [address, isConnected, status, token, queryClient])
 
     useEffect(() => {
         if (!isConnected || chainId === appChainId) {

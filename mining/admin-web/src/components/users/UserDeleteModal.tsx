@@ -86,7 +86,7 @@ export function UserDeleteModal({
               <strong>{user.teamCount ?? 0}</strong>
             </div>
             <div className="field compact">
-              <label>SPACE余额</label>
+              <label>SpaceXZI余额</label>
               <strong>{formatAmount(user.balance, { display: true })}</strong>
             </div>
             <div className="field compact">

@@ -334,13 +334,13 @@ export function MarketPage() {
           </div>
           <span>
             当前调整：{volumeAdjustmentQuery.data
-              ? `${formatAmount(volumeAdjustmentQuery.data.amount, { display: true })} SPACE`
+              ? `${formatAmount(volumeAdjustmentQuery.data.amount, { display: true })} SpaceXZI`
               : '加载中'}
           </span>
         </div>
         <div className="detail-filters">
           <div className="field compact">
-            <label htmlFor="market-volume-adjustment">调整数量（SPACE）</label>
+            <label htmlFor="market-volume-adjustment">调整数量（SpaceXZI）</label>
             <input
               id="market-volume-adjustment"
               value={volumeAdjustmentInput}
@@ -377,7 +377,7 @@ export function MarketPage() {
             {volumeAdjustmentFormError || volumeAdjustmentMutation.error?.message}
           </p>
         )}
-        <p className="status">该值会加到 indexer 返回的真实 24 小时 SPACE 成交量上，并保存在 Redis。</p>
+        <p className="status">该值会加到 indexer 返回的真实 24 小时 SpaceXZI 成交量上，并保存在 Redis。</p>
       </section>
 
       <section className="panel">
@@ -655,7 +655,7 @@ function OrderDetailPanel({
         </div>
         <div>
           <label>总数量 / 剩余</label>
-          <strong>{formatAmount(order.spaceAmount, { display: true })} / {formatAmount(order.remainingSpaceAmount, { display: true })} SPACE</strong>
+          <strong>{formatAmount(order.spaceAmount, { display: true })} / {formatAmount(order.remainingSpaceAmount, { display: true })} SpaceXZI</strong>
         </div>
         <div>
           <label>价格 / 总额</label>
@@ -730,7 +730,7 @@ function MarketTradeTable({
             <tr key={trade.id}>
               <td>{formatTime(trade.filledAt)}</td>
               <td>{formatTradeDirection(trade.side)}</td>
-              <td>{formatAmount(trade.spaceAmount, { display: true })} SPACE</td>
+              <td>{formatAmount(trade.spaceAmount, { display: true })} SpaceXZI</td>
               <td>{formatAmount(trade.price, { display: true, fractionDigits: 3 })} USDT</td>
               <td>{formatAmount(trade.usdtAmount, { display: true, fractionDigits: 3 })} USDT</td>
               <td>{formatTradeFee(trade)} USDT</td>
@@ -807,8 +807,8 @@ function MarketOrderTable({
               <td>{formatTime(order.createdAt)}</td>
               <td>{formatOrderSide(order.side)}</td>
               <td><span className={getOrderStatusClass(order.status)}>{formatOrderStatus(order.status)}</span></td>
-              <td>{formatAmount(order.spaceAmount, { display: true })} SPACE</td>
-              <td>{formatAmount(order.remainingSpaceAmount, { display: true })} SPACE</td>
+              <td>{formatAmount(order.spaceAmount, { display: true })} SpaceXZI</td>
+              <td>{formatAmount(order.remainingSpaceAmount, { display: true })} SpaceXZI</td>
               <td>{formatAmount(order.price, { display: true, fractionDigits: 3 })} USDT</td>
               <td>{formatOrderTotal(order)} USDT</td>
               <td>{order.visible ? '显示' : '隐藏'}</td>

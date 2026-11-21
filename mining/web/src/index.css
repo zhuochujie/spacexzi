@@ -56,7 +56,7 @@ body {
     font-size: 12px;
     border: none;
     border-radius: 5px;
-    background: linear-gradient(135deg, #6536E7 0%, #006EFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #006EFF 100%);
 }
 
 
@@ -76,4 +76,31 @@ body {
     font-style: normal;
     font-display: swap;
     unicode-range: U+5212, U+70B9, U+8282, U+8BA1;
+}
+
+/* Technology blue visual system */
+
+:root {
+    color-scheme: dark;
+    --canvas: #061321;
+    --surface: #0b2139;
+    --surface-raised: #102c49;
+    --line: #224b70;
+    --brand: #2589ff;
+    --brand-bright: #65dcff;
+    --text: #eef8ff;
+    --text-muted: #8ba6c4;
+}
+body { background: var(--canvas); color: var(--text); }
+button, input, select, textarea { font-family: inherit; }
+button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--brand-bright);
+    outline-offset: 3px;
+}
+img { -webkit-user-drag: none; }
+::selection { background: #166ca6; color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

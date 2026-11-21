@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import type { DividendLogItem } from '../../api'
 import { LoadingOverlay } from '../common/LoadingOverlay'
 import { Pagination } from '../common/Pagination'
@@ -55,7 +56,7 @@ export function DividendLogTable({
                   <td>{log.id}</td>
                   <td>{log.account.address}</td>
                   <td>{formatDividendType(log.type)}</td>
-                  <td>{log.token}</td>
+                  <td>{formatTokenSymbol(log.token)}</td>
                   <td>{formatAmount(log.amount, { display: true })}</td>
                   <td>{formatAmount(log.balanceBefore, { display: true })}</td>
                   <td>{formatAmount(log.balanceAfter, { display: true })}</td>

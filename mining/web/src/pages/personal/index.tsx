@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../utils/token'
 import { useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router"
@@ -5,14 +6,12 @@ import { useConnection, useWriteContract } from "wagmi"
 import { readContract, waitForTransactionReceipt } from "@wagmi/core"
 import multiavatar from "@multiavatar/multiavatar"
 import { toast } from "react-hot-toast"
-import { clearAccessToken, getBalanceLogs, getLoginAddress, getMarketLatestPrice, getProfile, getWithdrawFeeBps, withdraw, withdrawUsdt, type WithdrawToken } from "../../api"
+import { clearAccessToken, getLoginAddress, getMarketLatestPrice, getProfile, getWithdrawFeeBps, withdraw, withdrawUsdt, type WithdrawToken } from "../../api"
 import Modal from "../../components/modal"
 import SkeletonText from "../../components/skeleton-text"
 import { getFriendlyErrorKey, useI18n } from "../../i18n"
 import { formatAmount, parseTokenAmount } from "../../utils/format"
-import { formatShortDateTime } from "../../utils/date"
 import { formatAddress } from "../../utils/address"
-import { balanceLogText } from "../../utils/balance-log"
 import { market, mining } from "../../web3/constants"
 import { appChainId, wagmiConfig } from "../../web3/config"
 import styles from "./index.module.css"
@@ -36,14 +35,30 @@ function getWithdrawFee(amount: bigint, totalFeeBp: string | undefined) {
     return amount * feeBp / 10_000n
 }
 
+type PersonalIconKind = 'withdraw' | 'history' | 'language' | 'team' | 'ecosystem' | 'about' | 'logout'
+
+function PersonalIcon({ kind }: { kind: PersonalIconKind }) {
+    const paths: Record<PersonalIconKind, string> = {
+        withdraw: 'M12 18V4m-6 6 6-6 6 6M4 20h16',
+        history: 'M5 4h14v16H5V4Zm4 4h6m-6 4h6m-6 4h4',
+        language: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z',
+        team: 'M15 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM5 21v-2a7 7 0 0 1 14 0v2M18 5a3 3 0 0 1 0 6m3 9v-2a5 5 0 0 0-3-4',
+        ecosystem: 'm12 3 8 5v8l-8 5-8-5V8l8-5ZM4 8l8 5 8-5m-8 5v8',
+        about: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM12 11v6m0-10h.01',
+        logout: 'M10 4H4v16h6m4-12 4 4-4 4m-6-4h10',
+    }
+    return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={paths[kind]} /></svg>
+}
+
 function PersonalPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const { t } = useI18n()
+    const { t, language, setLanguage } = useI18n()
     const { address } = useConnection()
     const { mutateAsync: writeContract } = useWriteContract()
     const [assetVisible, setAssetVisible] = useState(true)
     const [withdrawOpen, setWithdrawOpen] = useState(false)
+    const [languageOpen, setLanguageOpen] = useState(false)
     const [dividendSummaryOpen, setDividendSummaryOpen] = useState(false)
     const [withdrawToken, setWithdrawToken] = useState<WithdrawToken>('SPACE')
     const [withdrawAmount, setWithdrawAmount] = useState('')
@@ -52,11 +67,6 @@ function PersonalPage() {
         queryKey: ['profile'],
         queryFn: getProfile,
         staleTime: 30_000,
-    })
-    const { data: logsData, isLoading: logsLoading, isError: logsIsError } = useQuery({
-        queryKey: ['balance-logs', 'personal', 1, 3],
-        queryFn: () => getBalanceLogs(1, 3),
-        staleTime: 20_000,
     })
     const { data: latestPrice, isLoading: latestPriceLoading } = useQuery({
         queryKey: ['market', 'latest-price'],
@@ -92,7 +102,6 @@ function PersonalPage() {
     const usdtBalance = formatAmount(profile?.usdtBalance, { display: true })
     const totalAssetValue = BigInt(profile?.usdtBalance || '0') + BigInt(profile?.balance || '0') * BigInt(latestPrice?.price || '0') / 10n ** 18n
     const assetValueLoading = profileLoading || latestPriceLoading
-    const balanceLogs = logsData?.list ?? []
     const withdrawAmountWei = parseTokenAmount(withdrawAmount)
     const withdrawBalanceWei = BigInt(withdrawToken === 'SPACE' ? profile?.withdrawableBalance || '0' : profile?.usdtBalance || '0')
     const withdrawFeeWei = withdrawToken === 'SPACE' ? getWithdrawFee(withdrawAmountWei, withdrawFeeBps?.totalFeeBp) : 0n
@@ -103,7 +112,6 @@ function PersonalPage() {
     const handleLogout = () => {
         clearAccessToken()
         queryClient.clear()
-        navigate('/login')
     }
 
     const closeWithdrawModal = () => {
@@ -177,6 +185,7 @@ function PersonalPage() {
             <button className={styles.profile_card} type="button" onClick={() => setDividendSummaryOpen(true)}>
                 <div className={styles.avatar} dangerouslySetInnerHTML={{ __html: avatarSvg }} />
                 <div className={styles.profile_info}>
+                    <span className={styles.profile_caption}>{t('personal.accountLabel')}</span>
                     <span className={styles.address_btn}>
                         {formatAddress(displayAddress)}
                     </span>
@@ -191,7 +200,7 @@ function PersonalPage() {
                             : (
                                 <>
                                     <span>VIP {profile?.vipLevel ?? 0}</span>
-                                    <span>Node V{profile?.nodeLevel ?? 0}</span>
+                                    <span>{t('personal.nodeBadge', { level: profile?.nodeLevel ?? 0 })}</span>
                                 </>
                             )}
                         {isFeeExemptAccount && <span>Maker</span>}
@@ -212,13 +221,17 @@ function PersonalPage() {
                             <img src={assetVisible ? VisibleIcon : InvisibleIcon} alt="" />
                         </button>
                     </div>
-                    <strong>{assetVisible ? assetValueLoading ? <SkeletonText width={132} height={22} /> : `≈ ${formatAmount(totalAssetValue, { display: true })} USDT` : '******'}</strong>
+                    <strong>
+                        {assetVisible && assetValueLoading ? <SkeletonText width={132} height={32} /> : (
+                            <><span className={styles.approx}>≈</span><span className={styles.asset_number}>{assetVisible ? formatAmount(totalAssetValue, { display: true }) : '••••••'}</span><small>USDT</small></>
+                        )}
+                    </strong>
                 </div>
                 <div className={styles.token_grid}>
                     <div>
                         <img src={SpaceIcon} alt="" />
                         <div>
-                            <span>SPACE</span>
+                            <span>SpaceXZI</span>
                             <strong>{assetVisible ? profileLoading ? <SkeletonText width={64} height={15} /> : spaceBalance : '***'}</strong>
                         </div>
                     </div>
@@ -231,49 +244,60 @@ function PersonalPage() {
                     </div>
                 </div>
                 <div className={styles.asset_action}>
-                    <button className={styles.withdraw_btn} type="button" onClick={() => setWithdrawOpen(true)}>{t('personal.withdraw')}</button>
+                    <button className={styles.withdraw_btn} type="button" onClick={() => setWithdrawOpen(true)}><PersonalIcon kind="withdraw" />{t('personal.withdraw')}</button>
+                    <button className={styles.history_btn} type="button" onClick={() => navigate('/personal/balance-logs')}><PersonalIcon kind="history" />{t('personal.balanceDetails')}</button>
                 </div>
             </div>
 
-            <div className={styles.logs_card}>
-                <div className={styles.logs_head}>
-                    <span>{t('personal.balanceDetails')}</span>
-                    <button type="button" onClick={() => navigate('/personal/balance-logs')}>{t('personal.viewAll')}</button>
-                </div>
-                <div className={styles.log_list}>
-                    {logsLoading && <div className={styles.log_state}>{t('personal.balanceLogsLoading')}</div>}
-                    {!logsLoading && logsIsError && <div className={styles.log_state}>{t('personal.balanceLogsFailed')}</div>}
-                    {!logsLoading && !logsIsError && balanceLogs.length === 0 && <div className={styles.log_state}>{t('personal.noBalanceLogs')}</div>}
-                    {balanceLogs.map((log) => (
-                        <div className={styles.log_item} key={log.id}>
-                            <div>
-                                <span>{t(balanceLogText[log.type])}</span>
-                                <em>{formatShortDateTime(log.createdAt)}</em>
-                            </div>
-                            <strong>{assetVisible ? `${formatAmount(log.amount, { signed: true, display: true })} ${log.token}` : '***'}</strong>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
+            <div className={styles.section_heading}><h2>{t('personal.services')}</h2></div>
             <div className={styles.menu_card}>
+                <button type="button" onClick={() => setLanguageOpen(true)}>
+                    <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="language" /></i>{t('login.language')}</span>
+                    <em className={styles.language_current}><small>{t(`login.${language}`)}</small>›</em>
+                </button>
                 <button type="button" onClick={() => navigate('/personal/team')}>
-                    <span>{t('personal.myTeam')}</span>
+                    <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="team" /></i>{t('personal.myTeam')}</span>
                     <em>›</em>
                 </button>
                 <button type="button" onClick={() => toast(t('common.comingSoon'))}>
-                    <span>{t('personal.subEcosystem')}</span>
+                    <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="ecosystem" /></i>{t('personal.subEcosystem')}</span>
                     <em>›</em>
                 </button>
                 <button type="button" onClick={() => navigate('/personal/about')}>
-                    <span>{t('personal.aboutUs')}</span>
+                    <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="about" /></i>{t('personal.aboutUs')}</span>
                     <em>›</em>
                 </button>
             </div>
 
             <button className={styles.logout_btn} type="button" onClick={handleLogout}>
-                {t('personal.logout')}
+                <PersonalIcon kind="logout" />{t('personal.logout')}
             </button>
+
+            <Modal
+                open={languageOpen}
+                title="login.language"
+                confirmText="common.cancel"
+                showCancel={false}
+                onConfirm={() => setLanguageOpen(false)}
+                onCancel={() => setLanguageOpen(false)}
+            >
+                <div className={styles.language_options} role="group" aria-label={t('login.language')}>
+                    {(['en', 'th', 'ko', 'zh'] as const).map((item) => (
+                        <button
+                            type="button"
+                            key={item}
+                            aria-pressed={language === item}
+                            onClick={() => {
+                                void setLanguage(item)
+                                setLanguageOpen(false)
+                            }}
+                        >
+                            <span>{t(`login.${item}`)}</span>
+                            {language === item && <span aria-hidden="true">✓</span>}
+                        </button>
+                    ))}
+                </div>
+            </Modal>
 
             <DividendSummaryModal
                 open={dividendSummaryOpen}
@@ -293,15 +317,14 @@ function PersonalPage() {
                     <label>
                         <span>{t('personal.selectToken')}</span>
                         <div className={styles.token_tabs}>
-                            <button className={withdrawToken === 'SPACE' ? styles.token_tab_active : ''} type="button" onClick={() => setWithdrawToken('SPACE')}>SPACE</button>
+                            <button className={withdrawToken === 'SPACE' ? styles.token_tab_active : ''} type="button" onClick={() => setWithdrawToken('SPACE')}>SpaceXZI</button>
                             <button className={withdrawToken === 'USDT' ? styles.token_tab_active : ''} type="button" onClick={() => setWithdrawToken('USDT')}>USDT</button>
                         </div>
                     </label>
-                    {withdrawToken === 'SPACE' && !profileLoading && !profile?.canWithdrawSpace && <p role="status">{t('personal.paidMinerRequired')}</p>}
                     <label>
                         <span className={styles.withdraw_amount_label}>
                             {t('personal.withdrawAmount')}
-                            <em>{t('personal.withdrawableBalance')}{profileLoading ? <SkeletonText width={60} height={11} /> : withdrawToken === 'SPACE' ? formatAmount(withdrawBalanceWei, { display: true }) : usdtBalance} {withdrawToken}</em>
+                            <em>{t('personal.withdrawableBalance')}{profileLoading ? <SkeletonText width={60} height={11} /> : withdrawToken === 'SPACE' ? formatAmount(withdrawBalanceWei, { display: true }) : usdtBalance} {formatTokenSymbol(withdrawToken)}</em>
                         </span>
                         <div className={styles.withdraw_input}>
                             <input
@@ -318,10 +341,10 @@ function PersonalPage() {
                     {withdrawToken === 'SPACE' && (
                         <div className={styles.withdraw_fee_row}>
                             <div>
-                                {t('personal.withdrawFee')}{formatAmount(withdrawFeeWei, { display: true })} SPACE
+                                {t('personal.withdrawFee')}{formatAmount(withdrawFeeWei, { display: true })} SpaceXZI
                             </div>
                             <div>
-                                {t('personal.withdrawReceive')}{formatAmount(withdrawReceiveWei, { display: true })} SPACE
+                                {t('personal.withdrawReceive')}{formatAmount(withdrawReceiveWei, { display: true })} SpaceXZI
                             </div>
                         </div>
                     )}

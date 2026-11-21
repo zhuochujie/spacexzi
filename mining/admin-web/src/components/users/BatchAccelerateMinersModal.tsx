@@ -97,7 +97,7 @@ export function BatchAccelerateMinersModal({
           </label>
 
           <p className="status warning">
-            这个操作会把匹配地址名下所有未出局的普通矿机直接释放到 expectedReward，并增加 SPACE 余额。
+            这个操作会把匹配地址名下所有未出局的普通矿机直接释放到 expectedReward，并增加 SpaceXZI 余额。
           </p>
 
           <p className="status">
@@ -123,7 +123,7 @@ export function BatchAccelerateMinersModal({
                 <strong>{result.acceleratedMinerCount}</strong>
               </div>
               <div className="summary-card">
-                <span>释放 SPACE</span>
+                <span>释放 SpaceXZI</span>
                 <strong>{formatAmount(result.totalReward, { display: true })}</strong>
               </div>
             </div>

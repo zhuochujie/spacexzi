@@ -1,3 +1,4 @@
+import { formatTokenSymbol } from '../../lib/token'
 import type { AdminMiner } from '../../api'
 import { LoadingOverlay } from '../common/LoadingOverlay'
 import { formatAmount } from '../../lib/format'
@@ -37,7 +38,7 @@ export function MinerTable({ miners, busy, onEdit }: MinerTableProps) {
               {miners.map((miner) => (
                 <tr key={miner.id}>
                   <td>{miner.id}</td>
-                  <td>{miner.name}</td>
+                  <td>{formatTokenSymbol(miner.name)}</td>
                   <td>{formatAmount(miner.price, { display: true })}</td>
                   <td>{formatAmount(miner.expectedReward, { display: true })}</td>
                   <td>

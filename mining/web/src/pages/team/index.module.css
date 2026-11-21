@@ -89,7 +89,7 @@
     font-weight: 600;
     border: none;
     border-radius: 6px;
-    background: linear-gradient(135deg, #6536E7 0%, #006EFF 100%);
+    background: linear-gradient(135deg, #368DE7 0%, #006EFF 100%);
 }
 
 .invite_card button:disabled {
