@@ -1,3 +1,4 @@
+import { withdrawableSpace } from 'src/account/utils/space-balance.util';
 import {
   Injectable,
   Logger,
@@ -103,6 +104,11 @@ export class AuthService {
       account.address,
     );
 
+    const [hasFreeMiner, canWithdrawSpace] = await Promise.all([
+      this.accountService.hasFreeMiner(account.id),
+      this.accountService.hasPaidMiner(account.id),
+    ]);
+    const withdrawableBalance = withdrawableSpace(account, hasFreeMiner);
     return {
       id: account.id,
       address: account.address,
@@ -110,13 +116,11 @@ export class AuthService {
       vipLevel: Math.max(account.vipLevel, account.manualVipLevel),
       nodeLevel: account.nodeLevel,
       balance: account.balance,
-      nonWithdrawableBalance: account.nonWithdrawableBalance,
-      withdrawableBalance: (
-        BigInt(account.balance) - BigInt(account.nonWithdrawableBalance ?? '0')
+      nonWithdrawableBalance: (
+        BigInt(account.balance) - withdrawableBalance
       ).toString(),
-      canWithdrawSpace: await this.accountService.hasPaidMinerPurchase(
-        account.id,
-      ),
+      withdrawableBalance: withdrawableBalance.toString(),
+      canWithdrawSpace,
       usdtBalance: account.usdtBalance,
       canInvite,
       isMarketMaker: account.isMarketMaker,

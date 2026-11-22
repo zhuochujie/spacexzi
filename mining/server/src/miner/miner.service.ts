@@ -1,5 +1,4 @@
 import { calculateFreeMinerRound } from './utils/free-miner-round.util';
-import { splitSpaceSpend } from 'src/account/utils/space-balance.util';
 import {
   lockMiningStart,
   parseMiningStartedAt,
@@ -241,15 +240,6 @@ export class MinerService {
       }
 
       const claimAmount = claimInfo.claimableReward;
-      const restrictedRemaining =
-        BigInt(freeMiner.nonWithdrawableReward) -
-        BigInt(freeMiner.claimedReward);
-      const restrictedAmount =
-        restrictedRemaining > 0n
-          ? restrictedRemaining < claimAmount
-            ? restrictedRemaining
-            : claimAmount
-          : 0n;
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const balanceBefore = account.balance;
       freeMiner.producedReward = claimInfo.projectedProducedReward.toString();
@@ -276,9 +266,6 @@ export class MinerService {
           ? null
           : currentTimestamp;
       freeMiner.lastRewardAt = currentTimestamp;
-      account.nonWithdrawableBalance = (
-        BigInt(account.nonWithdrawableBalance ?? '0') + restrictedAmount
-      ).toString();
       freeMiner.claimedReward = (
         BigInt(freeMiner.claimedReward) + claimAmount
       ).toString();
@@ -290,8 +277,6 @@ export class MinerService {
         accountBalanceLogRepository.create({
           accountId: account.id,
           type: AccountBalanceLogType.FreeMinerClaim,
-          restrictedChange: restrictedAmount.toString(),
-          restrictedBalanceAfter: account.nonWithdrawableBalance,
           token: AccountBalanceLogToken.Space,
           amount: claimAmount.toString(),
           balanceBefore,
@@ -435,7 +420,6 @@ export class MinerService {
           accountId: account.id,
           price: freeMinerConfig.price.toString(),
           expectedReward: event.spaceAmount,
-          nonWithdrawableReward: freeMinerConfig.price.toString(),
           roundRewardBp: Number(freeMinerConfig.cycleRewardBp),
           roundMaxCycle: cycleConfig.maxCycle,
           roundCycleExtension: cycleConfig.minerExtendedPerCycle,
@@ -606,24 +590,15 @@ export class MinerService {
         throw new ConflictException('INSUFFICIENT_BALANCE');
       }
 
-      const restrictedValue = splitSpaceSpend(
-        account,
-        internalValue,
-      ).restricted;
       // 预扣余额
       if (internalValue > BigInt(0)) {
         const balanceBefore = account.balance;
         account.balance = (BigInt(account.balance) - internalValue).toString();
-        account.nonWithdrawableBalance = (
-          BigInt(account.nonWithdrawableBalance ?? '0') - restrictedValue
-        ).toString();
         await accountRepository.save(account);
         await accountBalanceLogRepository.save(
           accountBalanceLogRepository.create({
             accountId: account.id,
             type: AccountBalanceLogType.MinerPurchase,
-            restrictedChange: (-restrictedValue).toString(),
-            restrictedBalanceAfter: account.nonWithdrawableBalance,
             token: AccountBalanceLogToken.Space,
             amount: (-internalValue).toString(),
             balanceBefore,
@@ -654,7 +629,6 @@ export class MinerService {
             minerId,
             price: miner.price,
             payValue,
-            restrictedValue: restrictedValue.toString(),
             expectedReward: miner.expectedReward,
             method,
             nonce,
@@ -991,19 +965,11 @@ export class MinerService {
 
         const balanceBefore = account.balance;
         account.balance = (BigInt(account.balance) + refundAmount).toString();
-        const restrictedRefund = BigInt(
-          pendingSignature.restrictedValue ?? '0',
-        );
-        account.nonWithdrawableBalance = (
-          BigInt(account.nonWithdrawableBalance ?? '0') + restrictedRefund
-        ).toString();
         await accountRepository.save(account);
         await accountBalanceLogRepository.save(
           accountBalanceLogRepository.create({
             accountId: account.id,
             type: AccountBalanceLogType.MinerPurchaseRefund,
-            restrictedChange: restrictedRefund.toString(),
-            restrictedBalanceAfter: account.nonWithdrawableBalance,
             token: AccountBalanceLogToken.Space,
             amount: refundAmount.toString(),
             balanceBefore,

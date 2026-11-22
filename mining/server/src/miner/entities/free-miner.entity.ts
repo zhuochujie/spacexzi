@@ -62,8 +62,6 @@ export class FreeMiner {
   @Column({ type: 'integer', nullable: true })
   roundStartedAt!: number | null;
 
-  @Column({ type: 'numeric', precision: 28, scale: 0 })
-  nonWithdrawableReward!: string;
   // Immutable for this round; refreshed only after the current reward is claimed.
   @Column({ type: 'integer' }) roundRewardBp!: number;
   @Column({ type: 'integer' }) roundMaxCycle!: number;

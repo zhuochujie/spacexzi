@@ -1,3 +1,4 @@
+import { withdrawableSpace } from 'src/account/utils/space-balance.util';
 import { calculateFreeMinerRound } from 'src/miner/utils/free-miner-round.util';
 import { FreeMiner } from 'src/miner/entities/free-miner.entity';
 import {
@@ -939,7 +940,6 @@ export class AdminService {
         id: number;
         address: string;
         balance: string;
-        nonWithdrawableBalance: string;
         usdtBalance: string;
       };
 
@@ -953,7 +953,6 @@ export class AdminService {
           id,
           address,
           balance::text AS balance,
-          non_withdrawable_balance::text AS "nonWithdrawableBalance",
           usdt_balance::text AS "usdtBalance"
         FROM account
         WHERE id = $1
@@ -992,13 +991,16 @@ export class AdminService {
       const fromBalanceBefore = fromAccount[balanceField];
       const toBalanceBefore = toAccount[balanceField];
 
-      if (
-        BigInt(fromBalanceBefore) -
-          (dto.token === AccountBalanceLogToken.Space
-            ? BigInt(fromAccount.nonWithdrawableBalance ?? '0')
-            : 0n) <
-        transferAmount
-      ) {
+      const availableBalance =
+        dto.token === AccountBalanceLogToken.Space
+          ? withdrawableSpace(
+              fromAccount,
+              await manager
+                .getRepository(FreeMiner)
+                .exists({ where: { accountId: fromAccount.id } }),
+            )
+          : BigInt(fromBalanceBefore);
+      if (availableBalance < transferAmount) {
         throw new ConflictException('INSUFFICIENT_BALANCE');
       }
 

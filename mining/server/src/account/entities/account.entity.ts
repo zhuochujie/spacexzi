@@ -9,10 +9,7 @@ import { AccountBalanceLog } from './account-balance-log.entity';
 import { AccountRelation } from './account-relation.entity';
 
 @Entity()
-@Check(
-  'account_restricted_balance_check',
-  '"non_withdrawable_balance" >= 0 AND "non_withdrawable_balance" <= "balance"',
-)
+@Check('account_balance_nonnegative_check', '"balance" >= 0')
 export class Account {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -34,10 +31,6 @@ export class Account {
 
   @Column({ type: 'numeric', precision: 28, scale: 0, default: 0 })
   usdtBalance!: string;
-
-  // Restricted portion of balance (balance itself remains the spendable total).
-  @Column({ type: 'numeric', precision: 28, scale: 0, default: 0 })
-  nonWithdrawableBalance!: string;
 
   @Column({ default: 0 })
   nodeLevel!: number;

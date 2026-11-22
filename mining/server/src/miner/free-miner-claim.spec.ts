@@ -15,7 +15,6 @@ function fixture(
     claimedReward: String(claimed),
     expectedReward: String(50n * 10n ** 18n),
     price: '10000000000000000000',
-    nonWithdrawableReward: '10000000000000000000',
     roundStartedAt: 0 as number | null,
     roundRewardBp: 4000,
     roundMaxCycle: 120 * 86400,
@@ -26,7 +25,7 @@ function fixture(
     rewardPerSecond: '0',
     ...overrides,
   };
-  const account = { id: 1, balance: '123', nonWithdrawableBalance: '0' };
+  const account = { id: 1, balance: '123' };
   const saveLog = jest.fn().mockResolvedValue({});
   const freeRepo = {
     findOne: jest.fn().mockResolvedValue(freeMiner),
@@ -81,7 +80,6 @@ describe('free miner claims without a paid-purchase allowance', () => {
     const result = await f.service.claimFreeMinerReward(1);
     expect(result.claimedAmount).toBe('50000000000000000000');
     expect(f.account.balance).toBe('50000000000000000123');
-    expect(f.account.nonWithdrawableBalance).toBe('10000000000000000000');
     expect(f.freeMiner.claimedReward).toBe('50000000000000000000');
     expect(result.freeMiner.claimableReward).toBe('0');
     expect(result.freeMiner).not.toHaveProperty('claimLimit');
@@ -109,11 +107,11 @@ describe('free miner claims without a paid-purchase allowance', () => {
     expect(f.account.balance).toBe('123');
     expect(f.saveLog).not.toHaveBeenCalled();
   });
-  it('splits a claim crossing the first-ten threshold and resumes only at claim time', async () => {
+  it('credits the full output and resumes only at claim time', async () => {
     const unit = 10n ** 18n;
     const f = fixture(11n * unit, 9n * unit);
     await f.service.claimFreeMinerReward(1);
-    expect(f.account.nonWithdrawableBalance).toBe(unit.toString());
+    expect(f.account.balance).toBe((123n + 2n * unit).toString());
     expect(f.freeMiner.roundStartedAt).toBe(86400);
     await expect(f.service.claimFreeMinerReward(1)).rejects.toThrow(
       'NO_FREE_MINER_REWARD_TO_CLAIM',

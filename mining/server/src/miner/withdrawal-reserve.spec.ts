@@ -5,6 +5,8 @@ import { AccountBalanceLog } from 'src/account/entities/account-balance-log.enti
 import { AccountWithdrawSignature } from 'src/account/entities/account-withdraw-signature.entity';
 import { Miner } from './entities/miner.entity';
 import { AccountMiner } from './entities/account-miner.entity';
+import { FreeMiner } from './entities/free-miner.entity';
+import { withdrawableSpace } from 'src/account/utils/space-balance.util';
 import { MinerPurchaseSignature } from './entities/miner-purchase-signature.entity';
 import { MinerPurchaseSignatureStatus } from './enums/miner-purchase-signature-status.enum';
 import { PurchaseMethod } from './enums/purchase-method.enum';
@@ -12,12 +14,11 @@ jest.mock('src/web3/web3.service', () => ({ Web3Service: class {} }));
 jest.mock('src/market/market.service', () => ({ MarketService: class {} }));
 
 const unit = 10n ** 18n;
-function fixture(paid = false) {
+function fixture(paid = false, free = true) {
   const account = {
     id: 1,
     address: '0xabc',
     balance: String(15n * unit),
-    nonWithdrawableBalance: String(10n * unit),
   };
   let signature: Record<string, unknown> | null = null;
   const logs: unknown[] = [];
@@ -29,7 +30,6 @@ function fixture(paid = false) {
           : null,
       ),
     ),
-    exists: jest.fn().mockResolvedValue(paid),
     create: (value: Record<string, unknown>) => value,
     save: jest.fn((value: Record<string, unknown>) => {
       signature = value;
@@ -43,7 +43,11 @@ function fixture(paid = false) {
     isPurchasable: true,
   };
   const minerRepository = { findOne: jest.fn().mockResolvedValue(miner) };
-  const accountMinerRepository = { findOne: jest.fn().mockResolvedValue(null) };
+  const accountMinerRepository = {
+    findOne: jest.fn().mockResolvedValue(null),
+    exists: jest.fn().mockResolvedValue(paid),
+  };
+  const freeMinerRepository = { exists: jest.fn().mockResolvedValue(free) };
   const manager = {
     getRepository: (entity: unknown) => {
       if (entity === Account)
@@ -53,6 +57,7 @@ function fixture(paid = false) {
         };
       if (entity === MinerPurchaseSignature) return signatures;
       if (entity === AccountMiner) return accountMinerRepository;
+      if (entity === FreeMiner) return freeMinerRepository;
       if (entity === Miner) return minerRepository;
       if (entity === AccountBalanceLog)
         return {
@@ -87,6 +92,7 @@ function fixture(paid = false) {
     miner,
     minerRepository,
     accountMinerRepository,
+    freeMinerRepository,
     account,
     signatures,
     logs,
@@ -106,17 +112,16 @@ function fixture(paid = false) {
   };
 }
 
-describe('restricted free-miner output spending and withdrawal', () => {
-  it('uses the restricted portion first and refunds it to the same balance type exactly once', async () => {
+describe('fixed free-miner withdrawal reserve', () => {
+  it('allows spending below the reserve and refunds the total exactly once', async () => {
     const f = fixture();
     const signature = await f.miners.generatePurchaseMinerSignature(
       1,
       'SPACE_TEST',
       PurchaseMethod.InternalBalance,
     );
-    expect(signature.restrictedValue).toBe(String(10n * unit));
     expect(f.account.balance).toBe(String(3n * unit));
-    expect(f.account.nonWithdrawableBalance).toBe('0');
+    expect(withdrawableSpace(f.account, true)).toBe(0n);
     const processor = f.miners as unknown as {
       processPurchaseMinerSignature: (
         s: MinerPurchaseSignature,
@@ -130,7 +135,7 @@ describe('restricted free-miner output spending and withdrawal', () => {
       signature.deadline + 1000,
     );
     expect(f.account.balance).toBe(String(15n * unit));
-    expect(f.account.nonWithdrawableBalance).toBe(String(10n * unit));
+    expect(withdrawableSpace(f.account, true)).toBe(5n * unit);
     await processor.processPurchaseMinerSignature(
       signature,
       false,
@@ -145,28 +150,56 @@ describe('restricted free-miner output spending and withdrawal', () => {
       'SPACE_TEST',
       PurchaseMethod.WalletBalance,
     );
-    expect(signature.restrictedValue).toBe('0');
+    expect(signature.payValue).toBe(String(12n * unit));
     expect(f.account.balance).toBe(String(15n * unit));
-    expect(f.account.nonWithdrawableBalance).toBe(String(10n * unit));
+    expect(withdrawableSpace(f.account, true)).toBe(5n * unit);
   });
   it('requires a successful paid purchase before allowing SPACE withdrawal', async () => {
     const f = fixture(false);
     await expect(f.accounts.generateWithdrawSignature(1, '1')).rejects.toThrow(
       'PAID_MINER_REQUIRED_FOR_WITHDRAW',
     );
-    expect(f.signatures.exists).toHaveBeenCalledWith({
-      where: { accountId: 1, status: MinerPurchaseSignatureStatus.Used },
+    expect(f.accountMinerRepository.exists).toHaveBeenCalledWith({
+      where: { accountId: 1 },
     });
+    expect(f.freeMinerRepository.exists).not.toHaveBeenCalled();
     expect(f.web3.signClaim).not.toHaveBeenCalled();
   });
-  it('allows paid-miner output to withdraw but preserves all restricted funds', async () => {
+  it('retains ten from the whole balance regardless of its income source', async () => {
     const f = fixture(true);
     await expect(
       f.accounts.generateWithdrawSignature(1, String(6n * unit)),
     ).rejects.toThrow('INSUFFICIENT_BALANCE');
     await f.accounts.generateWithdrawSignature(1, String(5n * unit));
     expect(f.account.balance).toBe(String(10n * unit));
-    expect(f.account.nonWithdrawableBalance).toBe(String(10n * unit));
+    expect(withdrawableSpace(f.account, true)).toBe(0n);
+    await expect(f.accounts.generateWithdrawSignature(1, '1')).rejects.toThrow(
+      'INSUFFICIENT_BALANCE',
+    );
+  });
+  it('allows a paid-miner account without a free miner to withdraw its full balance', async () => {
+    const f = fixture(true, false);
+    await f.accounts.generateWithdrawSignature(1, String(15n * unit));
+    expect(f.account.balance).toBe('0');
+    expect(f.freeMinerRepository.exists).toHaveBeenCalledWith({
+      where: { accountId: 1 },
+    });
+  });
+  it('reapplies the ten-token floor to new income after consuming the balance', async () => {
+    const f = fixture(true);
+    await f.miners.generatePurchaseMinerSignature(
+      1,
+      'SPACE_TEST',
+      PurchaseMethod.InternalBalance,
+    );
+    expect(f.account.balance).toBe(String(3n * unit));
+    f.account.balance = String(7n * unit);
+    await expect(f.accounts.generateWithdrawSignature(1, '1')).rejects.toThrow(
+      'INSUFFICIENT_BALANCE',
+    );
+    f.account.balance = String(15n * unit);
+    await f.accounts.generateWithdrawSignature(1, String(5n * unit));
+    expect(f.account.balance).toBe(String(10n * unit));
   });
   it.each(Object.values(PurchaseMethod))(
     'rejects an unlisted miner for %s without signing or debiting funds',
@@ -180,7 +213,7 @@ describe('restricted free-miner output spending and withdrawal', () => {
       expect(f.signatures.save).not.toHaveBeenCalled();
       expect(f.logs).toHaveLength(0);
       expect(f.account.balance).toBe(String(15n * unit));
-      expect(f.account.nonWithdrawableBalance).toBe(String(10n * unit));
+      expect(withdrawableSpace(f.account, true)).toBe(5n * unit);
     },
   );
 

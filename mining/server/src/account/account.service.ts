@@ -1,6 +1,4 @@
 import { withdrawableSpace } from './utils/space-balance.util';
-import { MinerPurchaseSignature } from 'src/miner/entities/miner-purchase-signature.entity';
-import { MinerPurchaseSignatureStatus } from 'src/miner/enums/miner-purchase-signature-status.enum';
 import { hasNodeMakerSlot } from 'src/node/node-maker-slots';
 import {
   buildNodeValueWeights,
@@ -160,13 +158,12 @@ export class AccountService {
     return accountRepository.findOne({ where: { address } });
   }
 
-  async hasPaidMinerPurchase(
-    accountId: number,
-    manager = this.dataSource.manager,
-  ) {
-    return manager.getRepository(MinerPurchaseSignature).exists({
-      where: { accountId, status: MinerPurchaseSignatureStatus.Used },
-    });
+  async hasPaidMiner(accountId: number, manager = this.dataSource.manager) {
+    return manager.getRepository(AccountMiner).exists({ where: { accountId } });
+  }
+
+  async hasFreeMiner(accountId: number, manager = this.dataSource.manager) {
+    return manager.getRepository(FreeMiner).exists({ where: { accountId } });
   }
 
   async createAccount(address: string, refCode: string) {
@@ -245,9 +242,7 @@ export class AccountService {
     accountId: number,
     manager: EntityManager = this.dataSource.manager,
   ): Promise<boolean> {
-    const hasPaidMiner = await manager.getRepository(AccountMiner).exists({
-      where: { accountId },
-    });
+    const hasPaidMiner = await this.hasPaidMiner(accountId, manager);
 
     if (hasPaidMiner) {
       return true;
@@ -258,9 +253,7 @@ export class AccountService {
       return false;
     }
 
-    const hasFreeMiner = await manager.getRepository(FreeMiner).exists({
-      where: { accountId },
-    });
+    const hasFreeMiner = await this.hasFreeMiner(accountId, manager);
 
     return hasFreeMiner;
   }
@@ -646,7 +639,7 @@ export class AccountService {
         throw new NotFoundException('ACCOUNT_NOT_FOUND');
       }
 
-      if (!(await this.hasPaidMinerPurchase(accountId, manager))) {
+      if (!(await this.hasPaidMiner(accountId, manager))) {
         throw new ForbiddenException('PAID_MINER_REQUIRED_FOR_WITHDRAW');
       }
       const withdrawAmount = BigInt(amount);
@@ -659,7 +652,12 @@ export class AccountService {
         throw new BadRequestException('INVALID_WITHDRAW_AMOUNT');
       }
 
-      if (withdrawableSpace(account) < withdrawAmount) {
+      if (
+        withdrawableSpace(
+          account,
+          await this.hasFreeMiner(accountId, manager),
+        ) < withdrawAmount
+      ) {
         throw new ConflictException('INSUFFICIENT_BALANCE');
       }
 

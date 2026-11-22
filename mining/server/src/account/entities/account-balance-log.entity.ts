@@ -61,12 +61,6 @@ export class AccountBalanceLog {
   @Column({ type: 'numeric', precision: 28, scale: 0 })
   balanceAfter!: string;
 
-  @Column({ type: 'numeric', precision: 28, scale: 0, default: 0 })
-  restrictedChange!: string;
-
-  @Column({ type: 'numeric', precision: 28, scale: 0, nullable: true })
-  restrictedBalanceAfter!: string | null;
-
   @Column({ type: 'integer' })
   createdAt!: number;
 

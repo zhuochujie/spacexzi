@@ -1,21 +1,11 @@
-export function withdrawableSpace(account: {
-  balance: string;
-  nonWithdrawableBalance?: string;
-}) {
-  const total = BigInt(account.balance);
-  const restricted = BigInt(account.nonWithdrawableBalance ?? '0');
-  if (restricted < 0n || total < restricted)
-    throw new Error('INVALID_SPACE_BALANCE');
-  return total - restricted;
-}
+export const FREE_MINER_RESERVE_WEI = 10n * 10n ** 18n;
 
-export function splitSpaceSpend(
-  account: { balance: string; nonWithdrawableBalance?: string },
-  amount: bigint,
+export function withdrawableSpace(
+  account: { balance: string },
+  hasFreeMiner: boolean,
 ) {
-  withdrawableSpace(account);
-  if (amount < 0n || amount > BigInt(account.balance))
-    throw new Error('INSUFFICIENT_BALANCE');
-  const restricted = BigInt(account.nonWithdrawableBalance ?? '0');
-  return { restricted: restricted < amount ? restricted : amount };
+  const total = BigInt(account.balance);
+  if (total < 0n) throw new Error('INVALID_SPACE_BALANCE');
+  if (!hasFreeMiner) return total;
+  return total > FREE_MINER_RESERVE_WEI ? total - FREE_MINER_RESERVE_WEI : 0n;
 }

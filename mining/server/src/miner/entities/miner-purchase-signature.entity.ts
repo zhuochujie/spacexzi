@@ -28,9 +28,6 @@ export class MinerPurchaseSignature {
   @Column({ type: 'numeric', precision: 28, scale: 0 })
   payValue!: string;
 
-  @Column({ type: 'numeric', precision: 28, scale: 0, default: 0 })
-  restrictedValue!: string;
-
   @Column({ type: 'numeric', precision: 28, scale: 0 })
   expectedReward!: string;
 

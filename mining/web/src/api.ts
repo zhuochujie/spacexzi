@@ -64,7 +64,6 @@ export type FreeMiner = {
     state: 'pending_start' | 'running' | 'pending_claim' | 'finished'
     roundStartedAt: number | null
     roundEndAt: number | null
-    nonWithdrawableReward: string
     hash: `0x${string}`
 }
 

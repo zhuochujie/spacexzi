@@ -1,9 +1,5 @@
 import { calculateFreeMinerRound } from './utils/free-miner-round.util';
 import { FreeMiner } from './entities/free-miner.entity';
-import {
-  splitSpaceSpend,
-  withdrawableSpace,
-} from 'src/account/utils/space-balance.util';
 
 const day = 86400;
 const unit = 10n ** 18n;
@@ -80,28 +76,5 @@ describe('free miner lazy 24-hour rounds with wall-time yield cycles', () => {
     const r = calculateFreeMinerRound(miner(), 1000000 * day);
     expect(r.cycle).toBe(config.maxCycle);
     expect(r.cycleEndAt).toBeGreaterThan(1000000 * day);
-  });
-});
-
-describe('restricted SPACE is a spendable subset of the total', () => {
-  it('spends restricted funds first without locking paid-miner output', () => {
-    expect(
-      splitSpaceSpend({ balance: '15', nonWithdrawableBalance: '10' }, 12n)
-        .restricted,
-    ).toBe(10n);
-    expect(
-      withdrawableSpace({ balance: '15', nonWithdrawableBalance: '10' }),
-    ).toBe(5n);
-    expect(
-      withdrawableSpace({ balance: '3', nonWithdrawableBalance: '0' }),
-    ).toBe(3n);
-  });
-  it('rejects invalid balances and overspending', () => {
-    expect(() =>
-      withdrawableSpace({ balance: '5', nonWithdrawableBalance: '10' }),
-    ).toThrow('INVALID_SPACE_BALANCE');
-    expect(() => splitSpaceSpend({ balance: '5' }, 6n)).toThrow(
-      'INSUFFICIENT_BALANCE',
-    );
   });
 });
