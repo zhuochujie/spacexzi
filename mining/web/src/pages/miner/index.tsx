@@ -22,7 +22,7 @@ import styles from "./index.module.css"
 import Accelerate from './images/accelerate.svg'
 import MinerIcon from './images/miner.svg'
 import Arrow from './images/arrow.svg'
-import DetailsIcon from './images/details.svg'
+import LedgerIcon from '../../components/icons/ledger-icon'
 
 const SECONDS_PER_DAY = 86400
 type MinerFilter = 'all' | 'pending' | 'pending_claim' | 'running' | 'out'
@@ -72,22 +72,10 @@ function getProgress(miner: RewardMiner) {
     return Math.min(100, Math.max(0, progress))
 }
 
-function getFreeMinerAvailableReward(miner: FreeMiner) {
-    if (miner.availableReward !== undefined) {
-        return BigInt(miner.availableReward)
-    }
-
-    const availableReward = BigInt(miner.producedReward) - BigInt(miner.claimedReward)
-
-    return availableReward > 0n ? availableReward : 0n
-}
-
 function toMinerLike(item: MinerListItem) {
-    if (item.type === 'paid') {
-        return item.data
-    }
-
-    return item.data
+    if (item.type === 'paid') return item.data
+    // Free-miner release statistics count only rewards already claimed into the balance.
+    return { ...item.data, producedReward: item.data.claimedReward }
 }
 
 function MinerPage() {
@@ -135,7 +123,7 @@ function MinerPage() {
     const pageLoading = loading || freeMinerLoading
     const pageError = isError || freeMinerError
     const pageErrorMessage = error || freeMinerQueryError
-    const totalMinerReward = BigInt(minerReward) + BigInt(freeMiner?.producedReward ?? '0')
+    const totalMinerReward = BigInt(minerReward) + BigInt(freeMiner?.claimedReward ?? '0')
     const totalRemainingReward = minerItems.reduce((total, item) => total + getRemainingReward(toMinerLike(item)), 0n)
     const selectedFilterLabel = t(FILTER_OPTIONS.find((option) => option.value === minerFilter)?.labelKey || 'miner.all')
     const filteredMiners = minerItems.filter((item) => {
@@ -181,7 +169,7 @@ function MinerPage() {
                             aria-label={t('miner.viewRewards')}
                             onClick={() => navigate('/miner/rewards')}
                         >
-                            <img src={DetailsIcon} alt="" />
+                            <LedgerIcon />
                         </button>
                     </div>
                     <span>{t('miner.subtitle')}</span>
@@ -318,7 +306,7 @@ function MinerPage() {
                                     ? (
                                         <div className={styles.unclaimed_reward}>
                                             <span>{t('miner.unclaimedReward')}</span>
-                                            <strong>{formatAmount(getFreeMinerAvailableReward(item.data), { display: true })}</strong>
+                                            <strong>{formatAmount(item.data.pendingReward, { display: true })}</strong>
                                         </div>
                                     )
                                     : <div className={`${styles.status_badge} ${isOut ? styles.status_out : ''}`}>{isOut ? t('miner.out') : t('miner.statusRunning')}</div>}

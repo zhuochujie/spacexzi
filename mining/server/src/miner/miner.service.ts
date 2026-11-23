@@ -24,7 +24,7 @@ import { parseEther } from 'viem';
 import { Account } from 'src/account/entities/account.entity';
 import { AccountMiner } from './entities/account-miner.entity';
 import { CustomException } from 'src/common/custom.exception';
-import { computeCycleEndAt } from './utils/cycle.util';
+import { computeCycleEndAt, computePaidCycleEndAt } from './utils/cycle.util';
 import { Web3Service } from 'src/web3/web3.service';
 import { randomUUID } from 'crypto';
 import { MinerPurchaseSignature } from './entities/miner-purchase-signature.entity';
@@ -200,7 +200,7 @@ export class MinerService {
 
     return {
       ...freeMiner,
-      producedReward: claimInfo.projectedProducedReward.toString(),
+      pendingReward: claimInfo.pendingReward.toString(),
       state: claimInfo.state,
       roundEndAt: claimInfo.roundEndAt,
       cycle: claimInfo.cycle,
@@ -296,6 +296,7 @@ export class MinerService {
           availableReward: (
             BigInt(freeMiner.producedReward) - BigInt(freeMiner.claimedReward)
           ).toString(),
+          pendingReward: '0',
           claimableReward: '0',
         },
         claimedAmount: claimAmount.toString(),
@@ -309,7 +310,13 @@ export class MinerService {
       freeMiner,
       Math.floor(Date.now() / 1000),
     );
-    return { ...result, claimableReward: result.availableReward };
+    const pendingReward =
+      result.projectedProducedReward - BigInt(freeMiner.claimedReward);
+    return {
+      ...result,
+      pendingReward: pendingReward > 0n ? pendingReward : 0n,
+      claimableReward: result.availableReward,
+    };
   }
 
   async getFreeMinerConfig() {
@@ -715,7 +722,7 @@ export class MinerService {
       accountMiner.cycleEndAt =
         rewardStartAt === null
           ? null
-          : computeCycleEndAt(rewardStartAt, accountMiner.cycle);
+          : computePaidCycleEndAt(rewardStartAt, accountMiner.cycle);
       accountMiner.lastRewardAt = rewardStartAt;
       accountMiner.rewardPerSecond = (
         (BigInt(miner.price) * cycleConfig.cycleRewardBp) /
@@ -737,7 +744,7 @@ export class MinerService {
             cycleEndAt:
               rewardStartAt === null
                 ? null
-                : computeCycleEndAt(rewardStartAt, cycle),
+                : computePaidCycleEndAt(rewardStartAt, cycle),
             lastRewardAt: rewardStartAt,
             rewardPerSecond: (
               (BigInt(miner.price) * cycleConfig.cycleRewardBp) /
@@ -770,42 +777,11 @@ export class MinerService {
   }
 
   async resetCycleAndDistributeRewardTask() {
-    const currentTimestamp = Math.floor(Date.now() / 1000);
     await this.dataSource.transaction(async (manager) => {
       const { miningStartedAt } = await lockMiningStart(manager);
       if (miningStartedAt === null) return;
       // 先发放奖励(存储过程)
       await manager.query('CALL distribute_miner_rewards()');
-      // 重置周期
-      // 1. 查询出未出局并且周期已到的矿机
-      // 修改 cycle、cycleEndAt、rewardPerSecond
-      const accountMinerRepository = manager.getRepository(AccountMiner);
-      const list = await accountMinerRepository
-        .createQueryBuilder('am')
-        .leftJoinAndSelect('am.miner', 'miner')
-        .where('am.produced_reward < am.expected_reward')
-        .andWhere('am.cycle_end_at <= :currentTimestamp', { currentTimestamp })
-        .getMany();
-      const cycleConfig = await this.configService.getMinerCycleConfig();
-      for (const accountMiner of list) {
-        accountMiner.cycle =
-          accountMiner.cycle + cycleConfig.minerExtendedPerCycle;
-        accountMiner.cycle =
-          accountMiner.cycle > cycleConfig.maxCycle
-            ? cycleConfig.maxCycle
-            : accountMiner.cycle;
-
-        accountMiner.cycleEndAt = computeCycleEndAt(
-          currentTimestamp,
-          accountMiner.cycle,
-        );
-        accountMiner.rewardPerSecond = (
-          (BigInt(accountMiner.miner.price) * cycleConfig.cycleRewardBp) /
-          10000n /
-          BigInt(accountMiner.cycle)
-        ).toString();
-      }
-      await accountMinerRepository.save(list);
     });
   }
 

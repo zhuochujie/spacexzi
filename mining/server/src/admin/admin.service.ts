@@ -306,7 +306,7 @@ export class AdminService {
       if (miningStartedAt !== null) return getMiningState(manager);
       const startedAt = Math.floor(Date.now() / 1000);
       await manager.query(
-        `UPDATE account_miner SET last_reward_at = $1, cycle_end_at = $1 + cycle WHERE last_reward_at IS NULL`,
+        `UPDATE account_miner SET last_reward_at = $1, cycle_end_at = FLOOR(($1::numeric + cycle + 28800) / 86400)::integer * 86400 - 28800 WHERE last_reward_at IS NULL`,
         [startedAt],
       );
       await manager.query(
@@ -514,13 +514,15 @@ export class AdminService {
       SELECT
         COUNT(*)::text AS "minerCount",
         COUNT(DISTINCT account_id)::text AS "accountCount",
-        COALESCE(SUM(LEAST(
-          ($1 - last_reward_at)::numeric * reward_per_second,
-          expected_reward - produced_reward
-        )), 0)::text AS "rewardTotal"
-      FROM account_miner
-      WHERE produced_reward < expected_reward
-        AND last_reward_at < $1
+        COALESCE(SUM(LEAST(r.reward, am.expected_reward - am.produced_reward)), 0)::text AS "rewardTotal"
+      FROM account_miner am
+      JOIN miner m ON m.id = am.miner_id
+      CROSS JOIN LATERAL calculate_paid_miner_reward(
+        am.last_reward_at, am.cycle_end_at, am.cycle, am.reward_per_second,
+        m.price, $1::integer
+      ) r
+      WHERE am.produced_reward < am.expected_reward
+        AND am.last_reward_at < $1
       `,
       [targetTimestamp],
     );
@@ -1859,6 +1861,33 @@ export class AdminService {
       ConfigService.FEE_EXEMPT_MIN_NODE_LEVEL_KEY,
       ConfigService.FEE_EXEMPT_MIN_VIP_LEVEL_KEY,
     ]);
+
+    const cycleKeys = [
+      ConfigService.INIT_CYCLE_SECONDS_KEY,
+      ConfigService.MAX_CYCLE_SECONDS_KEY,
+      ConfigService.MINER_EXTENDED_PER_CYCLE_SECONDS_KEY,
+    ];
+    if (cycleKeys.includes(key)) {
+      if (numericValue <= 0n || numericValue % 86400n !== 0n) {
+        throw new BadRequestException('CYCLE_MUST_BE_WHOLE_DAYS');
+      }
+      const otherKey =
+        key === ConfigService.INIT_CYCLE_SECONDS_KEY
+          ? ConfigService.MAX_CYCLE_SECONDS_KEY
+          : ConfigService.INIT_CYCLE_SECONDS_KEY;
+      const other = await configRepository.findOne({
+        where: { key: otherKey },
+      });
+      if (
+        other &&
+        ((key === ConfigService.INIT_CYCLE_SECONDS_KEY &&
+          numericValue > BigInt(other.value)) ||
+          (key === ConfigService.MAX_CYCLE_SECONDS_KEY &&
+            numericValue < BigInt(other.value)))
+      ) {
+        throw new BadRequestException('INVALID_CYCLE_RANGE');
+      }
+    }
 
     if (positiveIntegerKeys.has(key)) {
       const numberValue = Number(value);

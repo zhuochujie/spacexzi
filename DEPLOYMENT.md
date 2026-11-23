@@ -220,3 +220,17 @@ Vite 开发代理仅在开发服务中生效：用户 API 127.0.0.1:3000、管�
 ```
 
 该脚本删除旧不可提现余额、资金来源拆分及相关流水字段，保留账户总余额、领取记录和交易签名。新空库使用当前实体初始化即可，不需要执行此脚本。本次规则仅由后端生成签名前校验，合约不变；API 继续返回动态计算的 nonWithdrawableBalance、withdrawableBalance 和基于账户持有矿机的 canWithdrawSpace。
+
+### 付费矿机周期对齐北京时间0点
+
+新库按上面的初始化步骤安装 `sql/distribute_miner_rewards.sql`，其中同时定义后台预估使用的 `calculate_paid_miner_reward` 函数。
+已有环境升级时先停止 API 和 Worker，在 `mining/server` 目录通过连接目标业务库的 psql 执行：
+
+```sql
+\i sql/distribute_miner_rewards.sql
+\i sql/paid_miner_midnight.sql
+```
+
+随后启动新版 API 和 Worker。已有付费矿机的结束时间向前对齐北京时间0点，已发收益不追回；未结算部分按真实周期边界分段补算。首次购买、统一启动和复投的首个周期不足整天时按实际运行时间计算，不补足整周期收益；后续周期从原定0点边界推进。免费矿机不受影响。周期配置必须为完整天数，最大周期不得小于初始周期。
+
+隔离 SQL 回归用例位于 `mining/server/test/paid-miner-settlement.sql`，仅在空测试库运行，不要在业务库执行。

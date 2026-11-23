@@ -5,7 +5,7 @@ import { Account } from 'src/account/entities/account.entity';
 import { AccountMiner } from './entities/account-miner.entity';
 import { Miner } from './entities/miner.entity';
 import { FreeMiner } from './entities/free-miner.entity';
-import { computeCycleEndAt } from './utils/cycle.util';
+import { computeCycleEndAt, computePaidCycleEndAt } from './utils/cycle.util';
 import {
   lockMiningStart,
   parseMiningStartedAt,
@@ -162,7 +162,8 @@ describe('manual global mining start', () => {
       expect(f.paidRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
           lastRewardAt: startedAt === null ? null : 2000,
-          cycleEndAt: startedAt === null ? null : 88400,
+          cycleEndAt:
+            startedAt === null ? null : computePaidCycleEndAt(2000, 86400),
         }),
       );
       expect(f.configRepo.findOne).toHaveBeenCalledWith(
@@ -207,7 +208,12 @@ describe('manual global mining start', () => {
     ).rejects.toThrow('MINING_START_NOT_EDITABLE');
   });
 
-  it('gives a full cycle even when starting halfway through the day', () => {
+  it('keeps free cycles exact and floors paid cycles to Shanghai midnight', () => {
     expect(computeCycleEndAt(1794361234, 86400)).toBe(1794447634);
+    const end = computePaidCycleEndAt(1794361234, 30 * 86400);
+    expect((end + 28800) % 86400).toBe(0);
+    expect(end).toBeLessThanOrEqual(1794361234 + 30 * 86400);
+    expect(end).toBeGreaterThan(1794361234 + 29 * 86400);
+    expect(computePaidCycleEndAt(end, 40 * 86400)).toBe(end + 40 * 86400);
   });
 });

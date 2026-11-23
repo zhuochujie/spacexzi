@@ -10,13 +10,13 @@ const minerImages: Record<string, string> = {
     SPACE_5000: 'SPACE_5000',
 }
 
-export const freeMinerImage = '/miners/FREE_MINER.svg'
-export const fallbackMinerImage = '/miners/SPACE_10.svg'
+export const freeMinerImage = '/miners/FREE_MINER.png'
+export const fallbackMinerImage = '/miners/SPACE_10.png'
 
 export function getMinerPresentation(id: string, description: string) {
     const image = minerImages[id]
     return {
-        image: image ? `/miners/${image}.svg` : fallbackMinerImage,
+        image: image ? `/miners/${image}.png` : fallbackMinerImage,
         // 以默认矿机 ID 对应翻译，避免旧数据库里的错误描述键影响展示。
         description: image ? `miner.desc.${id}` : description,
     }

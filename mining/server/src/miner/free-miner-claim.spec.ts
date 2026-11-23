@@ -82,6 +82,7 @@ describe('free miner claims without a paid-purchase allowance', () => {
     expect(f.account.balance).toBe('50000000000000000123');
     expect(f.freeMiner.claimedReward).toBe('50000000000000000000');
     expect(result.freeMiner.claimableReward).toBe('0');
+    expect(result.freeMiner.pendingReward).toBe('0');
     expect(result.freeMiner).not.toHaveProperty('claimLimit');
     expect(f.freeRepo.findOne).toHaveBeenCalledWith(
       expect.objectContaining({ lock: { mode: 'pessimistic_write' } }),
@@ -124,6 +125,56 @@ describe('free miner claims without a paid-purchase allowance', () => {
     expect(f.freeMiner.producedReward).toBe('0');
     expect(f.account.balance).toBe('123');
     expect(f.freeRepo.save).not.toHaveBeenCalled();
+  });
+  it('separates partial-round pending output from released rewards before 24 hours', async () => {
+    jest.spyOn(Date, 'now').mockReturnValue(43200 * 1000);
+    const f = fixture(300n, 300n, { rewardPerSecond: '1' });
+    const view = await f.service.getMyFreeMiner(1);
+    expect(view).toMatchObject({
+      producedReward: '300',
+      claimedReward: '300',
+      pendingReward: '43200',
+      availableReward: '0',
+      claimableReward: '0',
+    });
+    await expect(f.service.claimFreeMinerReward(1)).rejects.toThrow(
+      'NO_FREE_MINER_REWARD_TO_CLAIM',
+    );
+    expect(f.freeMiner.producedReward).toBe('300');
+    expect(f.freeMiner.claimedReward).toBe('300');
+    expect(f.account.balance).toBe('123');
+    expect(f.freeRepo.save).not.toHaveBeenCalled();
+  });
+  it('does not count a matured round as released until it is claimed', async () => {
+    const f = fixture(300n, 300n, { rewardPerSecond: '1' });
+    jest.spyOn(Date, 'now').mockReturnValue(3 * 86400 * 1000);
+    expect(await f.service.getMyFreeMiner(1)).toMatchObject({
+      producedReward: '300',
+      claimedReward: '300',
+      pendingReward: '86400',
+      claimableReward: '86400',
+      state: 'pending_claim',
+    });
+    expect(f.account.balance).toBe('123');
+    const result = await f.service.claimFreeMinerReward(1);
+    expect(result.freeMiner).toMatchObject({
+      producedReward: '86700',
+      claimedReward: '86700',
+      pendingReward: '0',
+      claimableReward: '0',
+    });
+    expect(f.account.balance).toBe('86523');
+    expect(await f.service.getMyFreeMiner(1)).toMatchObject({
+      producedReward: '86700',
+      claimedReward: '86700',
+      pendingReward: '0',
+      claimableReward: '0',
+    });
+    expect(f.freeMiner).not.toHaveProperty('pendingReward');
+    await expect(f.service.claimFreeMinerReward(1)).rejects.toThrow(
+      'NO_FREE_MINER_REWARD_TO_CLAIM',
+    );
+    expect(f.saveLog).toHaveBeenCalledTimes(1);
   });
   it('preserves completed rewards when the administrator changes policy, applying new rates only to the next round', async () => {
     const unit = 10n ** 18n;

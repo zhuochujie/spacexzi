@@ -1,10 +1,11 @@
+import LedgerIcon from '../../components/icons/ledger-icon'
 import { formatTokenSymbol } from '../../utils/token'
 import { useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router"
 import { useConnection, useWriteContract } from "wagmi"
 import { readContract, waitForTransactionReceipt } from "@wagmi/core"
-import multiavatar from "@multiavatar/multiavatar"
+import AvatarImage from "./images/avatar.svg"
 import { toast } from "react-hot-toast"
 import { clearAccessToken, getLoginAddress, getMarketLatestPrice, getProfile, getWithdrawFeeBps, withdraw, withdrawUsdt, type WithdrawToken } from "../../api"
 import Modal from "../../components/modal"
@@ -35,12 +36,12 @@ function getWithdrawFee(amount: bigint, totalFeeBp: string | undefined) {
     return amount * feeBp / 10_000n
 }
 
-type PersonalIconKind = 'withdraw' | 'history' | 'language' | 'team' | 'ecosystem' | 'about' | 'logout'
+type PersonalIconKind = 'dividend' | 'withdraw' | 'language' | 'team' | 'ecosystem' | 'about' | 'logout'
 
 function PersonalIcon({ kind }: { kind: PersonalIconKind }) {
     const paths: Record<PersonalIconKind, string> = {
+        dividend: 'M12 3v9h9a9 9 0 1 1-9-9Zm3 .5A9 9 0 0 1 20.5 9H15V3.5Z',
         withdraw: 'M12 18V4m-6 6 6-6 6 6M4 20h16',
-        history: 'M5 4h14v16H5V4Zm4 4h6m-6 4h6m-6 4h4',
         language: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z',
         team: 'M15 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM5 21v-2a7 7 0 0 1 14 0v2M18 5a3 3 0 0 1 0 6m3 9v-2a5 5 0 0 0-3-4',
         ecosystem: 'm12 3 8 5v8l-8 5-8-5V8l8-5ZM4 8l8 5 8-5m-8 5v8',
@@ -97,7 +98,6 @@ function PersonalPage() {
         staleTime: 60_000,
     })
     const displayAddress = profile?.address || getLoginAddress() || address
-    const avatarSvg = multiavatar(displayAddress || 'space-user', true)
     const spaceBalance = formatAmount(profile?.balance, { display: true })
     const usdtBalance = formatAmount(profile?.usdtBalance, { display: true })
     const totalAssetValue = BigInt(profile?.usdtBalance || '0') + BigInt(profile?.balance || '0') * BigInt(latestPrice?.price || '0') / 10n ** 18n
@@ -182,10 +182,10 @@ function PersonalPage() {
 
     return (
         <div className={styles.page}>
-            <button className={styles.profile_card} type="button" onClick={() => setDividendSummaryOpen(true)}>
-                <div className={styles.avatar} dangerouslySetInnerHTML={{ __html: avatarSvg }} />
+            <h1 className={styles.profile_caption}>{t('personal.accountLabel')}</h1>
+            <div className={styles.profile_card}>
+                <div className={styles.avatar} aria-hidden="true"><img src={AvatarImage} alt="" /></div>
                 <div className={styles.profile_info}>
-                    <span className={styles.profile_caption}>{t('personal.accountLabel')}</span>
                     <span className={styles.address_btn}>
                         {formatAddress(displayAddress)}
                     </span>
@@ -206,8 +206,7 @@ function PersonalPage() {
                         {isFeeExemptAccount && <span>Maker</span>}
                     </div>
                 </div>
-                <span className={styles.profile_arrow} aria-hidden="true" />
-            </button>
+            </div>
 
             <div className={styles.balance_card}>
                 <div className={styles.asset_total}>
@@ -245,7 +244,7 @@ function PersonalPage() {
                 </div>
                 <div className={styles.asset_action}>
                     <button className={styles.withdraw_btn} type="button" onClick={() => setWithdrawOpen(true)}><PersonalIcon kind="withdraw" />{t('personal.withdraw')}</button>
-                    <button className={styles.history_btn} type="button" onClick={() => navigate('/personal/balance-logs')}><PersonalIcon kind="history" />{t('personal.balanceDetails')}</button>
+                    <button className={styles.history_btn} type="button" onClick={() => navigate('/personal/balance-logs')}><LedgerIcon />{t('personal.balanceDetails')}</button>
                 </div>
             </div>
 
@@ -254,6 +253,10 @@ function PersonalPage() {
                 <button type="button" onClick={() => setLanguageOpen(true)}>
                     <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="language" /></i>{t('login.language')}</span>
                     <em className={styles.language_current}><small>{t(`login.${language}`)}</small>›</em>
+                </button>
+                <button type="button" onClick={() => setDividendSummaryOpen(true)}>
+                    <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="dividend" /></i>{t('dividendSummary.title')}</span>
+                    <em>›</em>
                 </button>
                 <button type="button" onClick={() => navigate('/personal/team')}>
                     <span className={styles.menu_label}><i className={styles.menu_icon}><PersonalIcon kind="team" /></i>{t('personal.myTeam')}</span>

@@ -1,3 +1,46 @@
+-- Shared by settlement and the admin estimate; all amounts are integer wei.
+CREATE OR REPLACE FUNCTION calculate_paid_miner_reward(
+  p_start integer, p_end integer, p_cycle integer, p_rate numeric,
+  p_price numeric, p_now integer
+) RETURNS TABLE(reward numeric, next_cycle integer, next_end integer, next_rate numeric)
+LANGUAGE plpgsql STABLE AS $$
+DECLARE
+  cursor_at integer := p_start;
+  segment_end integer;
+  max_cycle integer;
+  extension integer;
+  bp numeric;
+BEGIN
+  reward := 0;
+  next_cycle := p_cycle;
+  next_end := FLOOR((p_end::numeric + 28800) / 86400)::integer * 86400 - 28800;
+  next_rate := p_rate;
+  IF p_start IS NULL OR p_end IS NULL THEN RETURN NEXT; RETURN; END IF;
+  SELECT value::integer INTO max_cycle FROM config WHERE key = 'MAX_CYCLE_SECONDS';
+  SELECT value::integer INTO extension FROM config WHERE key = 'MINER_EXTENDED_PER_CYCLE_SECONDS';
+  SELECT value::numeric INTO bp FROM config WHERE key = 'CYCLE_REWARD_BP';
+  IF max_cycle IS NULL OR extension IS NULL OR bp IS NULL OR
+     max_cycle < 86400 OR extension < 86400 OR
+     max_cycle % 86400 <> 0 OR extension % 86400 <> 0 THEN
+    RAISE EXCEPTION 'INVALID_MINER_CYCLE_CONFIG';
+  END IF;
+  -- Advance from the original boundary, including when settlement was missed.
+  LOOP
+    IF next_end <= cursor_at THEN
+      next_cycle := LEAST(next_cycle + extension, max_cycle);
+      next_rate := FLOOR(p_price * bp / 10000 / next_cycle);
+      next_end := next_end + next_cycle;
+      CONTINUE;
+    END IF;
+    EXIT WHEN cursor_at >= p_now;
+    segment_end := LEAST(p_now, next_end);
+    reward := reward + (segment_end::numeric - cursor_at) * next_rate;
+    cursor_at := segment_end;
+  END LOOP;
+  RETURN NEXT;
+END;
+$$;
+
 CREATE OR REPLACE PROCEDURE distribute_miner_rewards()
 LANGUAGE plpgsql
 AS $$
@@ -40,17 +83,25 @@ END IF;
 RAISE NOTICE '开始发放奖励，当前秒级时间戳：%', current_timestamp_sec;
 
 -- 1. 计算每台矿机本轮实际矿机奖励
-CREATE TEMP TABLE tmp_miner_rewards ON COMMIT DROP AS
-SELECT
-    am.id AS account_miner_id,
-    am.account_id,
-    LEAST(
-    (current_timestamp_sec - am.last_reward_at)::numeric * am.reward_per_second,
-    am.expected_reward - am.produced_reward
-    ) AS reward
+CREATE TEMP TABLE tmp_paid_miner_states ON COMMIT DROP AS
+SELECT am.id, r.*
 FROM account_miner am
+JOIN miner m ON m.id = am.miner_id
+CROSS JOIN LATERAL calculate_paid_miner_reward(
+    am.last_reward_at, am.cycle_end_at, am.cycle, am.reward_per_second,
+    m.price, current_timestamp_sec
+) r
 WHERE am.produced_reward < am.expected_reward
     AND am.last_reward_at < current_timestamp_sec;
+
+CREATE TEMP TABLE tmp_miner_rewards ON COMMIT DROP AS
+SELECT am.id AS account_miner_id, am.account_id,
+    LEAST(s.reward, am.expected_reward - am.produced_reward) AS reward
+FROM account_miner am JOIN tmp_paid_miner_states s ON s.id = am.id;
+
+UPDATE account_miner am
+SET cycle = s.next_cycle, cycle_end_at = s.next_end, reward_per_second = s.next_rate
+FROM tmp_paid_miner_states s WHERE am.id = s.id;
 
 SELECT
     COUNT(*),

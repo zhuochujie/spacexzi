@@ -1,5 +1,5 @@
+import { fallbackMinerImage, getMinerPresentation } from '../../utils/miner-presentation'
 import { formatTokenSymbol } from '../../utils/token'
-import MiningStartNotice from '../mining-start-notice'
 import type { PurchaseMinerMethod } from '../../api'
 import { useI18n } from '../../i18n'
 import type { MinerPurchaseState } from '../../hooks/useMinerPurchase'
@@ -36,7 +36,6 @@ function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
             >
                 {selectedMiner && (
                     <div className={styles.payment_modal}>
-                        <MiningStartNotice />
                         <div className={styles.payment_summary}>
                             <span>{formatTokenSymbol(selectedMiner.name)}</span>
                             <span>
@@ -124,11 +123,12 @@ function MinerPaymentModal({ purchase }: MinerPaymentModalProps) {
                 {successMiner && (
                     <div className={styles.success_modal}>
                         <img
-                            src={`/miners/${successMiner.id}.svg`}
+                            src={getMinerPresentation(successMiner.id, '').image}
                             alt={formatTokenSymbol(successMiner.name)}
                             onError={(event) => {
-                                event.currentTarget.src =
-                                    '/miners/SPACE_100.svg'
+                                if (!event.currentTarget.src.endsWith(fallbackMinerImage)) {
+                                    event.currentTarget.src = fallbackMinerImage
+                                }
                             }}
                         />
                         <strong>{formatTokenSymbol(successMiner.name)}</strong>

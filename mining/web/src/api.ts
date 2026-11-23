@@ -54,6 +54,7 @@ export type FreeMiner = {
     expectedReward: string
     producedReward: string
     claimedReward: string
+    pendingReward: string
     availableReward?: string
     claimableReward?: string
     cycle: number
